@@ -1,0 +1,7 @@
+Java Launcher: /Users/michael/Library/Java/JavaVirtualMachines/jbrsdk-17.0.9-x86/Contents/Home/bin/java
+Arguments: '--inJar, /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-injected.jar, --outJar, /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30_mapped_official_1.20.1/forge-1.20.1-47.2.30_mapped_official_1.20.1.jar, --logFile, accesstransform.log, --atFile, /Users/michael/Documents/dev/AmethystWings/build/_atJar_4/parent_at.cfg'
+Classpath:
+ - /Users/michael/.gradle/caches/forge_gradle/maven_downloader/net/minecraftforge/accesstransformers/8.2.0/accesstransformers-8.2.0-fatjar.jar
+Working directory: /Users/michael/Documents/dev/AmethystWings/build/_atJar_4
+Main class: net.minecraftforge.accesstransformer.TransformerProcessor
+====================================
