@@ -1,5 +1,7 @@
 package com.m_w_k.amethystwings.capability;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -8,26 +10,30 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.*;
 
 public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider {
     public static final Capability<WingsCapability> WINGS_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static final WingsCapability EMPTY = new WingsCapability(null);
+    private static final UUID attributeUUID = UUID.fromString("07822f19-e797-7d6a-d56d-29fcb4271b04");
+    private final Multimap<Attribute, AttributeModifier> attributes = HashMultimap.create(1,1);
+
+    public static final WingsCapability EMPTY = new WingsCapability();
 
     public static final int DURABILITY = 2 * 2 * 3 * 5;
     public static final int DURABILITY_S = 5 * 2 * 3 * 5;
@@ -38,29 +44,69 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private CompoundTag cachedTag;
     private NonNullList<ItemStack> itemStacksCache;
 
+    private boolean isBlocking;
+
     private double armorToughnessContribution;
+    private static final int MAX_SHIELD_CRYSTALS = 21;
     private final List<Crystal> crystalsShieldSorted = new ObjectArrayList<>();
     private final List<Crystal> crystalsElytraSorted = new ObjectArrayList<>();
+    private final List<Crystal> crystalsElytraSortedActive = new ObjectArrayList<>();
     private final List<Crystal> crystalsBoostSorted = new ObjectArrayList<>();
+    private final List<Crystal> crystalsBoostSortedActive = new ObjectArrayList<>();
     private final List<Crystal> shatteredCrystals = new ObjectArrayList<>();
 
-    private ChangeListener listener = (a) -> {};
+    private WingsCapability() {
+        this.stack = null;
+    }
 
     public WingsCapability(ItemStack stack) {
         this.stack = stack;
+        getItemList();
+        onContentsChanged();
     }
 
-    public WingsCapability(ItemStack stack, ChangeListener listener) {
-        this.stack = stack;
-        this.listener = listener;
+    public boolean hasToughness() {
+        return this.armorToughnessContribution > 0;
     }
 
-    public double getSumToughness() {
-        return armorToughnessContribution;
+    public Multimap<Attribute, AttributeModifier> getAttributes() {
+        return this.attributes;
+    }
+
+    public void setBlocking(boolean blocking) {
+        if (this.isBlocking != blocking) {
+            this.isBlocking = blocking;
+            if (blocking) {
+                // when shielding, crystals that are in the shield can no longer be used for other things.
+                crystalsBoostSortedActive.clear();
+                crystalsBoostSortedActive.addAll(crystalsBoostSorted);
+                crystalsBoostSortedActive.removeAll(crystalsShieldSorted);
+                crystalsElytraSortedActive.clear();
+                crystalsElytraSortedActive.addAll(crystalsElytraSorted);
+                crystalsElytraSortedActive.removeAll(crystalsShieldSorted);
+            } else {
+                initActiveLists();
+            }
+        }
+    }
+
+    private void initActiveLists() {
+        crystalsBoostSortedActive.clear();
+        crystalsBoostSortedActive.addAll(crystalsBoostSorted);
+        crystalsElytraSortedActive.clear();
+        crystalsElytraSortedActive.addAll(crystalsElytraSorted);
     }
 
     public boolean canBlock() {
         return crystalsShieldSorted.size() >= 8;
+    }
+
+    public boolean canElytra() {
+        return crystalsElytraSortedActive.size() >= 24;
+    }
+
+    public boolean canBoost() {
+        return crystalsBoostSortedActive.size() > 0;
     }
 
     public void takeBlockDamage(double incomingDamage, boolean shatter, Runnable onExcessDamage) {
@@ -77,9 +123,38 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             }
             damage = crystal.damage(damage);
         }
-        if (damage > 0) onExcessDamage.run();
+        onContentsChanged();
+        if (damage > 0)
+            onExcessDamage.run();
         for (Crystal crystal : shatteredCrystals) {
             this.setStackInSlot(crystal.slot, ItemStack.EMPTY);
+        }
+    }
+
+    public boolean elytraFlightTick(LivingEntity entity, int flightTicks) {
+        if (!entity.level().isClientSide) {
+            int nextFlightTick = flightTicks + 1;
+            if (nextFlightTick % 10 == 0) {
+                if (nextFlightTick % 20 == 0) {
+                    int damage = applyDamageReduction(1, false);
+                    if (damage == 1) weightedDamageElytraCrystal();
+                }
+                entity.gameEvent(net.minecraft.world.level.gameevent.GameEvent.ELYTRA_GLIDE);
+            }
+        }
+        return true;
+    }
+
+    private void weightedDamageElytraCrystal() {
+        double sumDurability = crystalsElytraSortedActive.stream().map(Crystal::getDurabilityRemaining)
+                .reduce(Integer::sum).orElse(0);
+        if (sumDurability == 0) return;
+        double selector = Math.random();
+        double discovered = 0;
+        for (Crystal crystal : crystalsElytraSortedActive) {
+            discovered += crystal.getDurabilityRemaining() / sumDurability;
+            if (discovered > selector)
+                crystal.damage(1);
         }
     }
 
@@ -212,7 +287,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack)
     {
-        return stack.getItem() instanceof WingsCrystalItem;
+        return stack.getItem() instanceof WingsCrystalItem || stack.isEmpty();
     }
 
     @Override
@@ -284,10 +359,18 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             }
         }
         // make sure we sort in descending order, not ascending.
-        this.crystalsShieldSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority()));
-        this.crystalsElytraSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority()));
-        this.crystalsBoostSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority()));
-        listener.onContentsChanged(this);
+        this.crystalsShieldSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+        if (this.crystalsShieldSorted.size() > MAX_SHIELD_CRYSTALS) {
+            this.crystalsShieldSorted.subList(MAX_SHIELD_CRYSTALS, this.crystalsShieldSorted.size()).clear();
+        }
+        this.crystalsElytraSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+        this.crystalsBoostSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+        if (this.armorToughnessContribution > 0) {
+            this.attributes.removeAll(Attributes.ARMOR_TOUGHNESS);
+            this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
+                    this.armorToughnessContribution, AttributeModifier.Operation.ADDITION));
+        }
+        initActiveLists();
     }
 
     @Override
@@ -295,11 +378,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
         return WINGS_CAPABILITY.orEmpty(cap, this.holder);
-    }
-
-    @FunctionalInterface
-    public interface ChangeListener {
-        void onContentsChanged(WingsCapability capability);
     }
 
     protected class Crystal {
@@ -313,6 +391,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             this.slot = slot;
             this.crystalStack = stack;
             this.crystalItem = (WingsCrystalItem) stack.getItem();
+        }
+
+        public int getDurabilityRemaining() {
+            return this.crystalStack.getMaxDamage() - this.crystalStack.getDamageValue();
         }
 
         public int damage(int damage) {

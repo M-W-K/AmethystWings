@@ -1,10 +1,18 @@
 package com.m_w_k.amethystwings.item;
 
 import com.m_w_k.amethystwings.api.util.WingsAction;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 
 public class WingsCrystalItem extends Item {
     private final EnumSet<WingsAction> supportedActions;
@@ -21,7 +29,7 @@ public class WingsCrystalItem extends Item {
     }
 
     public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, WingsAction supportedAction, WingsAction... supportedActions) {
-        this(properties, priority, (byte) 0, mass, supportedAction, supportedActions);
+        this(properties, priority, mass, 0, supportedAction, supportedActions);
     }
 
     public boolean supportsActions() {
@@ -35,6 +43,14 @@ public class WingsCrystalItem extends Item {
     public boolean isActionSupported(WingsAction action) {
         if (supportsActions()) return supportedActions.contains(action);
         return false;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
+        super.appendHoverText(stack, level, components, flag);
+        if (supportsActions()) getSupportedActions().forEach((action) -> action.appendHoverText(components));
+        if (this.armorToughnessContribution > 0)
+            components.add(Component.translatable("item.amethystwings.wings_controller.attribute", this.armorToughnessContribution).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     public byte getPriority() {

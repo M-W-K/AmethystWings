@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "e": {
+      "item": "minecraft:elytra"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "n": {
+      "item": "minecraft:nether_star"
+    },
+    "t": {
+      "item": "amethystwings:treated_amethyst"
+    }
+  },
+  "pattern": [
+    "ini",
+    "ttt",
+    "iei"
+  ],
+  "result": {
+    "item": "amethystwings:wings_controller"
+  },
+  "show_notification": true
+}

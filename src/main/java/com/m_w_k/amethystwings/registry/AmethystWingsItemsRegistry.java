@@ -15,7 +15,7 @@ import static com.m_w_k.amethystwings.capability.WingsCapability.DURABILITY_S;
 public class AmethystWingsItemsRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
-    public static final RegistryObject<Item> WINGS = ITEMS.register("wings", () -> new WingsItem(new Item.Properties()));
+    public static final RegistryObject<Item> WINGS = ITEMS.register("wings_controller", () -> new WingsItem(new Item.Properties()));
 
     public static final RegistryObject<Item> TREATED_AMETHYST = ITEMS.register("treated_amethyst", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> RESONANT_AMETHYST = ITEMS.register("resonant_amethyst",

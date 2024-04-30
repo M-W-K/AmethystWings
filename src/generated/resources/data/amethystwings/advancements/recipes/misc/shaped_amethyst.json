@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "criteria": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "amethystwings:treated_amethyst"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "amethystwings:shaped_amethyst"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "criteria",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "amethystwings:shaped_amethyst"
+    ]
+  },
+  "sends_telemetry_event": false
+}

@@ -1,6 +1,7 @@
 package com.m_w_k.amethystwings.inventory;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
+import com.m_w_k.amethystwings.gui.menu.WingsMenu;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,7 +49,7 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerID, @NotNull Inventory inventory, @NotNull Player player) {
-        return ChestMenu.sixRows(containerID, inventory, this);
+        return new WingsMenu(containerID, inventory, this);
     }
 
     @Override

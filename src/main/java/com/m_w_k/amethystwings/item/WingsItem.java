@@ -1,10 +1,10 @@
 package com.m_w_k.amethystwings.item;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.capability.WingsCapability;
+import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.inventory.WingsContainer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -13,33 +13,27 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.common.util.NonNullLazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
-public class WingsItem extends Item implements WingsCapability.ChangeListener, Equipable {
-    private static final UUID attributeUUID = UUID.fromString("07822f19-e797-7d6a-d56d-29fcb4271b04");
-    private final Multimap<Attribute, AttributeModifier> attributes;
+public class WingsItem extends Item implements Equipable {
     public WingsItem(Properties itemProperties) {
         super(itemProperties);
-        attributes = HashMultimap.create(1,1);
         DispenserBlock.registerBehavior(this, ArmorItem.DISPENSE_ITEM_BEHAVIOR);
     }
 
     @Override
     public @NotNull UseAnim getUseAnimation(@NotNull ItemStack p_41452_) {
-        return UseAnim.CUSTOM;
+        return UseAnim.BLOCK;
     }
 
     @Override
@@ -52,16 +46,30 @@ public class WingsItem extends Item implements WingsCapability.ChangeListener, E
         ItemStack stack = player.getItemInHand(hand);
         if (player.isCrouching()) {
             if (!level.isClientSide()) {
-                var cap = player.getItemInHand(hand).getCapability(ForgeCapabilities.ITEM_HANDLER);
-                cap.ifPresent(handler -> {
-                    WingsContainer.openGUI((ServerPlayer) player, hand);
-                });
+                var cap = player.getItemInHand(hand).getCapability(WingsCapability.WINGS_CAPABILITY);
+                cap.ifPresent(handler -> WingsContainer.openGUI((ServerPlayer) player, hand));
             }
             return InteractionResultHolder.success(stack);
-        } else {
+        } else if (getUseDuration(stack) != 0) {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(stack);
+        } else {
+            return InteractionResultHolder.pass(stack);
         }
+    }
+
+    @Override
+    public void onUseTick(@NotNull Level p_41428_, @NotNull LivingEntity entity, @NotNull ItemStack stack, int p_41431_) {
+        super.onUseTick(p_41428_, entity, stack, p_41431_);
+        WingsCapability cap = getCapability(stack);
+        cap.setBlocking(true);
+        if (!cap.canBlock()) entity.stopUsingItem();
+    }
+
+    @Override
+    public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
+        super.onStopUsing(stack, entity, count);
+        getCapability(stack).setBlocking(false);
     }
 
     @Override
@@ -71,8 +79,9 @@ public class WingsItem extends Item implements WingsCapability.ChangeListener, E
 
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if (slot == EquipmentSlot.OFFHAND) {
-            return this.attributes;
+        WingsCapability cap = getCapability(stack);
+        if (slot == EquipmentSlot.OFFHAND && cap.hasToughness()) {
+            return cap.getAttributes();
         }
         return super.getAttributeModifiers(slot, stack);
     }
@@ -87,19 +96,26 @@ public class WingsItem extends Item implements WingsCapability.ChangeListener, E
         return EquipmentSlot.OFFHAND;
     }
 
-    @Override
-    public void onContentsChanged(WingsCapability capability) {
-        this.attributes.removeAll(Attributes.ARMOR_TOUGHNESS);
-        this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
-                capability.getSumToughness(), AttributeModifier.Operation.ADDITION));
-    }
-
-    private WingsCapability getCapability(ItemStack stack) {
+    public WingsCapability getCapability(ItemStack stack) {
+        stack.reviveCaps();
         return stack.getCapability(WingsCapability.WINGS_CAPABILITY).orElse(WingsCapability.EMPTY);
     }
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return new WingsCapability(stack, this);
+        return new WingsCapability(stack);
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new IClientItemExtensions() {
+            private final NonNullLazy<WingsItemStackRenderer> renderer = NonNullLazy.of(WingsItemStackRenderer::new);
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return renderer.get();
+            }
+        });
     }
 }

@@ -1,0 +1,18 @@
+{
+"itemGroup.amethystwings":"Amethyst Wings",
+
+"screen.amethystwings.item":"Amethyst Wings Controller",
+
+"item.amethystwings.wings_controller":"Amethyst Wings Controller",
+"item.amethystwings.treated_amethyst":"Treated Amethyst Shard",
+"item.amethystwings.resonant_amethyst":"Resonant Amethyst Shard",
+"item.amethystwings.auric_amethyst":"Auric Amethyst Shard",
+"item.amethystwings.hardened_amethyst":"Hardened Amethyst Shard",
+"item.amethystwings.energetic_amethyst":"Energetic Amethyst Shard",
+"item.amethystwings.shaped_amethyst":"Shaped Amethyst Shard",
+
+  "item.amethystwings.wings_controller.action.shield": "Shield",
+  "item.amethystwings.wings_controller.action.elytra": "Elytra",
+  "item.amethystwings.wings_controller.action.boost": "Boost",
+  "item.amethystwings.wings_controller.attribute": "Toughness contribution: %s"
+}

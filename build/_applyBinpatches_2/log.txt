@@ -1,5 +1,5 @@
 Java Launcher: /Users/michael/Library/Java/JavaVirtualMachines/jbrsdk-17.0.9-x86/Contents/Home/bin/java
-Arguments: '--clean, /Users/michael/.gradle/caches/forge_gradle/mcp_repo/net/minecraft/joined/1.20.1-20230612.114412/joined-1.20.1-20230612.114412-srg.jar, --output, /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatched.jar, --apply, /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatches.lzma'
+Arguments: '--clean, /Users/michael/.gradle/caches/forge_gradle/mcp_repo/net/minecraft/joined/1.20.1-20230612.114412/joined-1.20.1-20230612.114412-srg.jar, --output, /Users/michael/Documents/dev/AmethystWings/build/fg_cache/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatched.jar, --apply, /Users/michael/Documents/dev/AmethystWings/build/fg_cache/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatches.lzma'
 Classpath:
  - /Users/michael/.gradle/caches/forge_gradle/maven_downloader/net/minecraftforge/binarypatcher/1.1.1/binarypatcher-1.1.1-fatjar.jar
 Working directory: /Users/michael/Documents/dev/AmethystWings/build/_applyBinpatches_2
@@ -7,12 +7,12 @@ Main class: net.minecraftforge.binarypatcher.ConsoleTool
 ====================================
 Applying: 
   Clean:     /Users/michael/.gradle/caches/forge_gradle/mcp_repo/net/minecraft/joined/1.20.1-20230612.114412/joined-1.20.1-20230612.114412-srg.jar
-  Output:    /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatched.jar
+  Output:    /Users/michael/Documents/dev/AmethystWings/build/fg_cache/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatched.jar
   KeepData:  false
   Unpatched: false
   Pack200:   false
   Legacy:    false
-Loading patches file: /Users/michael/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatches.lzma
+Loading patches file: /Users/michael/Documents/dev/AmethystWings/build/fg_cache/net/minecraftforge/forge/1.20.1-47.2.30/forge-1.20.1-47.2.30-binpatches.lzma
   Reading patch com.mojang.blaze3d.pipeline.RenderTarget.binpatch
     Checksum: 151eb55a Exists: true
   Reading patch com.mojang.blaze3d.platform.GlStateManager$BlendState.binpatch
