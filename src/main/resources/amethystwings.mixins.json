@@ -8,6 +8,7 @@
     "PlayerMixin"
   ],
   "client": [
-    "LocalPlayerMixin"
+    "LocalPlayerMixin",
+    "HumanoidArmorLayerMixin"
   ]
 }

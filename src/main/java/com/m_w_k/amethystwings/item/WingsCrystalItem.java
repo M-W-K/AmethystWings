@@ -3,6 +3,7 @@ package com.m_w_k.amethystwings.item;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -10,7 +11,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -20,16 +20,23 @@ public class WingsCrystalItem extends Item {
     private final byte priority;
     private final byte mass;
 
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, double armorToughnessContribution, WingsAction supportedAction, WingsAction... supportedActions) {
+    private final ResourceLocation wingsRenderTexture;
+
+    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, double armorToughnessContribution, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
         super(properties);
         this.supportedActions = supportedAction.isNone() ? null : EnumSet.of(supportedAction, supportedActions);
         this.priority = priority;
         this.mass = mass;
         this.armorToughnessContribution = armorToughnessContribution;
+        this.wingsRenderTexture = wingsRenderTexture;
     }
 
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, WingsAction supportedAction, WingsAction... supportedActions) {
-        this(properties, priority, mass, 0, supportedAction, supportedActions);
+    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
+        this(properties, priority, mass, 0, wingsRenderTexture, supportedAction, supportedActions);
+    }
+
+    public ResourceLocation getWingsRenderTexture() {
+        return this.wingsRenderTexture;
     }
 
     public boolean supportsActions() {

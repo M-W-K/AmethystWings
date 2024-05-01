@@ -44,10 +44,10 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (player.isCrouching()) {
+        WingsItem item = (WingsItem) stack.getItem();
+        if (player.isShiftKeyDown()) {
             if (!level.isClientSide()) {
-                var cap = player.getItemInHand(hand).getCapability(WingsCapability.WINGS_CAPABILITY);
-                cap.ifPresent(handler -> WingsContainer.openGUI((ServerPlayer) player, hand));
+                WingsContainer.openGUI((ServerPlayer) player, hand);
             }
             return InteractionResultHolder.success(stack);
         } else if (getUseDuration(stack) != 0) {

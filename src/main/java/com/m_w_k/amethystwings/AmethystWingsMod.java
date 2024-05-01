@@ -1,12 +1,15 @@
 package com.m_w_k.amethystwings;
 
+import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
 import com.m_w_k.amethystwings.registry.AmethystWingsRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ public class AmethystWingsMod {
 
         AmethystWingsRegistry.init(modEventBus);
         modEventBus.addListener(this::gatherData);
+        modEventBus.addListener(this::onModelRegistration);
 
 //        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -30,5 +34,9 @@ public class AmethystWingsMod {
         DataGenerator gen = event.getGenerator();
         PackOutput packOutput = gen.getPackOutput();
         gen.addProvider(event.includeServer(), new AmethystWingsRecipeProvider(packOutput));
+    }
+
+    public void onModelRegistration(ModelEvent.RegisterAdditional event) {
+        event.register(WingsItemStackRenderer.WINGS_INVENTORY_MODEL);
     }
 }

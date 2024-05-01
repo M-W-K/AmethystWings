@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 
-    public LivingEntityMixin(EntityType<?> p_19870_, Level p_19871_) {
+    private LivingEntityMixin(EntityType<?> p_19870_, Level p_19871_) {
         super(p_19870_, p_19871_);
     }
 
@@ -44,7 +45,8 @@ public abstract class LivingEntityMixin extends Entity {
             ItemStack itemStack = this.getItemBySlot(EquipmentSlot.OFFHAND);
             if (itemStack.getItem() instanceof WingsItem item) {
                 WingsCapability cap = item.getCapability(itemStack);
-                flag = cap.canElytra() && cap.elytraFlightTick(((LivingEntity) (Object) this), this.fallFlyTicks);
+                LivingEntity thiss = (LivingEntity) (Object) this;
+                flag = cap.canElytra() && cap.elytraFlightTick(thiss, this.fallFlyTicks);
             }
         }
         return flag;

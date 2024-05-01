@@ -1,5 +1,6 @@
 package com.m_w_k.amethystwings.gui.menu;
 
+import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,8 @@ public class WingsMenu extends AbstractContainerMenu {
         this.container = p_39232_;
         p_39232_.startOpen(p_39231_.player);
         int i = 36;
-        lockedslot = p_39231_.selected;
+        boolean needsLocking = p_39231_.getSelected().getItem() instanceof WingsItem;
+        lockedslot = needsLocking ? p_39231_.selected : -1;
 
         for(int j = 0; j < 6; ++j) {
             for(int k = 0; k < 9; ++k) {

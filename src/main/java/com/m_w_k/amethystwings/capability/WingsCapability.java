@@ -3,11 +3,16 @@ package com.m_w_k.amethystwings.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.api.util.WingsAction;
+import com.m_w_k.amethystwings.client.model.CrystalModel;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -15,6 +20,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -24,6 +30,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4d;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 
 import java.util.*;
 
@@ -46,6 +55,11 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private boolean isBlocking;
 
+    private double lastPartialTicks;
+    private double partialTicks;
+    private double delta;
+    private boolean tickPassed;
+
     private double armorToughnessContribution;
     private static final int MAX_SHIELD_CRYSTALS = 21;
     private final List<Crystal> crystalsShieldSorted = new ObjectArrayList<>();
@@ -53,6 +67,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private final List<Crystal> crystalsElytraSortedActive = new ObjectArrayList<>();
     private final List<Crystal> crystalsBoostSorted = new ObjectArrayList<>();
     private final List<Crystal> crystalsBoostSortedActive = new ObjectArrayList<>();
+    private final List<Crystal> crystals = new ObjectArrayList<>();
     private final List<Crystal> shatteredCrystals = new ObjectArrayList<>();
 
     private WingsCapability() {
@@ -126,9 +141,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         onContentsChanged();
         if (damage > 0)
             onExcessDamage.run();
-        for (Crystal crystal : shatteredCrystals) {
-            this.setStackInSlot(crystal.slot, ItemStack.EMPTY);
-        }
+        handleShatteredCrystals();
     }
 
     public boolean elytraFlightTick(LivingEntity entity, int flightTicks) {
@@ -153,9 +166,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         double discovered = 0;
         for (Crystal crystal : crystalsElytraSortedActive) {
             discovered += crystal.getDurabilityRemaining() / sumDurability;
-            if (discovered > selector)
+            if (discovered > selector) {
+                // no need to handle excess damage, it won't occur.
                 crystal.damage(1);
+                break;
+            }
         }
+        handleShatteredCrystals();
     }
 
     private int applyDamageReduction(double damage, boolean isBlock) {
@@ -167,6 +184,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         double decimal = damage % 1;
         if (Math.random() < decimal) whole++;
         return whole;
+    }
+
+    public void updatePartialTicks(double partialTicks) {
+        this.lastPartialTicks = this.partialTicks;
+        this.partialTicks = partialTicks;
+        this.tickPassed = this.lastPartialTicks > this.partialTicks;
+        this.delta = this.partialTicks - this.lastPartialTicks + (this.tickPassed ? 1 : 0);
     }
 
     @Override
@@ -342,6 +366,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private void onContentsChanged() {
         this.armorToughnessContribution = 0;
+        this.crystals.clear();
         this.crystalsShieldSorted.clear();
         this.crystalsElytraSorted.clear();
         this.crystalsBoostSorted.clear();
@@ -351,6 +376,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             if (stack.getItem() instanceof WingsCrystalItem item) {
                 Crystal crystal = new Crystal(stack, i);
                 this.armorToughnessContribution += item.getArmorToughnessContribution();
+                this.crystals.add(crystal);
                 if (item.supportsActions()) {
                     if (item.isActionSupported(WingsAction.SHIELD)) this.crystalsShieldSorted.add(crystal);
                     if (item.isActionSupported(WingsAction.ELYTRA)) this.crystalsElytraSorted.add(crystal);
@@ -370,6 +396,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
                     this.armorToughnessContribution, AttributeModifier.Operation.ADDITION));
         }
+        this.crystals.forEach(crystal -> crystal.cachedTarget = null);
         initActiveLists();
     }
 
@@ -380,17 +407,117 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return WINGS_CAPABILITY.orEmpty(cap, this.holder);
     }
 
-    protected class Crystal {
+    public List<Crystal> getCrystals() {
+        return this.crystals;
+    }
+
+    /**
+     * Should always be called after crystals are damaged for any reason.
+     */
+    private void handleShatteredCrystals() {
+        for (Crystal crystal : shatteredCrystals) {
+            this.setStackInSlot(crystal.slot, ItemStack.EMPTY);
+        }
+    }
+
+    public class Crystal {
+
+        private final CrystalModel model;
+        private boolean isMirrored;
+
+        private static final double LERP_FACTOR = 1;
+        private final Quaterniond lastRotation = new Quaterniond();
+        private Vec3 cachedPosition = new Vec3(0, 0, 0);
+        private Vec3 lastPosition = new Vec3(0, 0, 0);
+        private CrystalTarget cachedTarget;
+        private final Vector3d entityVelocity = new Vector3d();
+
+
         public final ItemStack crystalStack;
         public final WingsCrystalItem crystalItem;
         public final int slot;
 
         public boolean isShattered = false;
 
-        public Crystal(ItemStack stack, int slot) {
+        protected Crystal(ItemStack stack, int slot) {
             this.slot = slot;
             this.crystalStack = stack;
             this.crystalItem = (WingsCrystalItem) stack.getItem();
+            this.model = new CrystalModel(CrystalModel.createLayer().bakeRoot());
+        }
+
+        private double partialTicksC() {
+            return partialTicks * LERP_FACTOR;
+        }
+
+        private CrystalTarget resolveTarget() {
+            if (this.cachedTarget == null) {
+                this.cachedTarget = new CrystalTarget(new Vec3(0, 0, -1),
+                        new Quaterniond(new AxisAngle4d(1, 1, 0, 0)));
+            }
+            return this.cachedTarget;
+        }
+
+        public Vec3 calculateOffset(Vec3 entityVelocity, double entityRot) {
+            // code from Vec3, but collated to reduce instantiation count.
+            double f = Math.cos(-entityRot);
+            double f1 = Math.sin(-entityRot);
+            Vec3 target = resolveTarget().targetPosition;
+            double x = target.x() * f + target.z() * f1;
+            double y = target.y();
+            double z = target.z() * f - target.x() * f1;
+
+            this.lerpVelocity(entityVelocity);
+            x -= this.log(this.entityVelocity.x());
+            y -= this.log(this.entityVelocity.y());
+            z -= this.log(this.entityVelocity.z());
+
+            return this.lerpPosition(new Vec3(x, y, z));
+        }
+
+        private double log(double value) {
+            return Math.log1p(Math.abs(value)) * Math.signum(value);
+        }
+
+        public Quaterniond calculateRotation(double entityRot) {
+            Quaterniond target = resolveTarget().targetRotation;
+            Quaterniond rot = new Quaterniond(new AxisAngle4d(entityRot, 0, 1, 0));
+            return this.lerpRotation(rot.mul(target));
+        }
+
+        private void lerpVelocity(Vec3 velocity) {
+            // move entityVelocity delta% of the remaining distance to the target velocity.
+            // should be relatively unaffected by framerate?
+            this.entityVelocity.x = Mth.lerp(delta, this.entityVelocity.x(), velocity.x());
+            this.entityVelocity.y = Mth.lerp(delta, this.entityVelocity.y(), velocity.y());
+            this.entityVelocity.z = Mth.lerp(delta, this.entityVelocity.z(), velocity.z());
+        }
+
+        private Vec3 lerpPosition(Vec3 target) {
+            if (tickPassed) {
+                this.lastPosition = new Vec3(
+                        Mth.lerp(LERP_FACTOR, this.lastPosition.x(), target.x()),
+                        Mth.lerp(LERP_FACTOR, this.lastPosition.y(), target.y()),
+                        Mth.lerp(LERP_FACTOR, this.lastPosition.z(), target.z())
+                );
+            }
+            this.cachedPosition = target;
+            return new Vec3(
+                    Mth.lerp(partialTicksC(), this.lastPosition.x(), target.x()),
+                    Mth.lerp(partialTicksC(), this.lastPosition.y(), target.y()),
+                    Mth.lerp(partialTicksC(), this.lastPosition.z(), target.z())
+            );
+
+        }
+
+        private Quaterniond lerpRotation(Quaterniond target) {
+            target.normalize();
+            if (tickPassed) this.lastRotation.nlerp(target, LERP_FACTOR);
+            return this.lastRotation.nlerp(target, partialTicksC(), new Quaterniond());
+        }
+
+        public void render(PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+            this.model.render(poseStack, buffer.getBuffer(RenderType.entitySolid(crystalItem.getWingsRenderTexture())), combinedLightIn, combinedOverlayIn, isMirrored);
         }
 
         public int getDurabilityRemaining() {
@@ -412,6 +539,16 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         public void shatter() {
             isShattered = true;
             shatteredCrystals.add(this);
+        }
+    }
+
+    protected static class CrystalTarget {
+        public Vec3 targetPosition;
+        public Quaterniond targetRotation;
+
+        public CrystalTarget(Vec3 targetPosition, Quaterniond targetRotation) {
+            this.targetPosition = targetPosition;
+            this.targetRotation = targetRotation;
         }
     }
 }

@@ -11,6 +11,7 @@ import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 import static com.m_w_k.amethystwings.api.util.WingsAction.*;
 import static com.m_w_k.amethystwings.capability.WingsCapability.DURABILITY;
 import static com.m_w_k.amethystwings.capability.WingsCapability.DURABILITY_S;
+import static com.m_w_k.amethystwings.client.model.CrystalModel.DEFAULT_TEXTURES;
 
 public class AmethystWingsItemsRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
@@ -19,13 +20,13 @@ public class AmethystWingsItemsRegistry {
 
     public static final RegistryObject<Item> TREATED_AMETHYST = ITEMS.register("treated_amethyst", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> RESONANT_AMETHYST = ITEMS.register("resonant_amethyst",
-            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY), (byte) 0, (byte) 5, 0.1, ELYTRA, SHIELD, BOOST));
+            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY), (byte) 0, (byte) 5, 0.1, DEFAULT_TEXTURES.get(0), ELYTRA, SHIELD, BOOST));
     public static final RegistryObject<Item> HARDENED_AMETHYST = ITEMS.register("hardened_amethyst",
-            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 10, SHIELD));
+            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 10, DEFAULT_TEXTURES.get(1), SHIELD));
     public static final RegistryObject<Item> ENERGETIC_AMETHYST = ITEMS.register("energetic_amethyst",
-            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 5, BOOST));
+            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 5, DEFAULT_TEXTURES.get(2), BOOST));
     public static final RegistryObject<Item> SHAPED_AMETHYST = ITEMS.register("shaped_amethyst",
-            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 5, ELYTRA));
+            () -> new WingsCrystalItem(new Item.Properties().durability(DURABILITY_S), (byte) 10, (byte) 5, DEFAULT_TEXTURES.get(3), ELYTRA));
     public static final RegistryObject<Item> AURIC_AMETHYST = ITEMS.register("auric_amethyst",
-            () -> new WingsCrystalItem(new Item.Properties().stacksTo(1), (byte) 0, (byte) 5, 0.5, NONE));
+            () -> new WingsCrystalItem(new Item.Properties().stacksTo(1), (byte) 0, (byte) 5, 0.5, DEFAULT_TEXTURES.get(4), NONE));
 }

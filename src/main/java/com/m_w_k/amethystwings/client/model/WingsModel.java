@@ -2,22 +2,13 @@ package com.m_w_k.amethystwings.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4d;
-import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 
-import java.util.function.Function;
-
 public class WingsModel {
-    private final ModelPart root;
     private final ModelPart front_brace;
     private final ModelPart back_brace;
     private final ModelPart connector;
@@ -25,7 +16,6 @@ public class WingsModel {
     private final ModelPart connector_bottom;
 
     public WingsModel(ModelPart root) {
-        this.root = root;
         this.front_brace = root.getChild("front_brace");
         this.back_brace = root.getChild("back_brace");
         this.connector = root.getChild("connector");
@@ -49,13 +39,12 @@ public class WingsModel {
     public void render(PoseStack poseStack, VertexConsumer vertexConsumer, int combinedLightIn, int combinedOverlayIn, boolean mirrored) {
         this.front_brace.render(poseStack, vertexConsumer, combinedLightIn, combinedOverlayIn);
         this.back_brace.render(poseStack, vertexConsumer, combinedLightIn, combinedOverlayIn);
-        if (mirrored) {
-            poseStack.pushPose();
-            poseStack.rotateAround(new Quaternionf(new AxisAngle4d(Math.toRadians(180), 0, 0, 1)), (float) 8 /16, (float) 6 /16, 0);
-        }
+        poseStack.pushPose();
+        if (mirrored)
+            poseStack.rotateAround(new Quaternionf(new AxisAngle4d(Math.toRadians(180), 0, 0, 1)), (float) 8 / 16, (float) 6 / 16, 0);
         this.connector.render(poseStack, vertexConsumer, combinedLightIn, combinedOverlayIn);
         this.connector_top.render(poseStack, vertexConsumer, combinedLightIn, combinedOverlayIn);
         this.connector_bottom.render(poseStack, vertexConsumer, combinedLightIn, combinedOverlayIn);
-        if (mirrored) poseStack.popPose();
+        poseStack.popPose();
     }
 }

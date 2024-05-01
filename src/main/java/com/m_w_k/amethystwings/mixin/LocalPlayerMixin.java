@@ -26,10 +26,11 @@ public abstract class LocalPlayerMixin extends Player {
 
     @Shadow @Final public ClientPacketListener connection;
 
-    public LocalPlayerMixin(Level p_250508_, BlockPos p_250289_, float p_251702_, GameProfile p_252153_) {
+    private LocalPlayerMixin(Level p_250508_, BlockPos p_250289_, float p_251702_, GameProfile p_252153_) {
         super(p_250508_, p_250289_, p_251702_, p_252153_);
     }
 
+    @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(method = "aiStep", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 25), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void extendedElytraCheck(CallbackInfo ci, boolean flag, boolean flag1, boolean flag2, float f, boolean flag3, boolean flag4, boolean flag5, boolean flag6, boolean flag9, ItemStack itemstack) {
         if (itemstack.canElytraFly(this) || !this.tryToStartFallFlying()) return;
