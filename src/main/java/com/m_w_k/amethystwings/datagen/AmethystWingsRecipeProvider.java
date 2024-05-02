@@ -3,16 +3,13 @@ package com.m_w_k.amethystwings.datagen;
 import com.m_w_k.amethystwings.registry.AmethystWingsItemsRegistry;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-public class AmethystWingsRecipeProvider extends net.minecraft.data.recipes.RecipeProvider {
+public class AmethystWingsRecipeProvider extends RecipeProvider {
     public AmethystWingsRecipeProvider(PackOutput p_248933_) {
         super(p_248933_);
     }

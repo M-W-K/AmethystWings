@@ -20,23 +20,23 @@ public class WingsCrystalItem extends Item {
     private final byte priority;
     private final byte mass;
 
-    private final ResourceLocation wingsRenderTexture;
+    private final ResourceLocation wingsModelLoc;
 
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, double armorToughnessContribution, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
+    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, double armorToughnessContribution, ResourceLocation wingsModelLoc, WingsAction supportedAction, WingsAction... supportedActions) {
         super(properties);
         this.supportedActions = supportedAction.isNone() ? null : EnumSet.of(supportedAction, supportedActions);
         this.priority = priority;
         this.mass = mass;
         this.armorToughnessContribution = armorToughnessContribution;
-        this.wingsRenderTexture = wingsRenderTexture;
+        this.wingsModelLoc = wingsModelLoc;
     }
 
     public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
         this(properties, priority, mass, 0, wingsRenderTexture, supportedAction, supportedActions);
     }
 
-    public ResourceLocation getWingsRenderTexture() {
-        return this.wingsRenderTexture;
+    public ResourceLocation getWingsModelLoc() {
+        return this.wingsModelLoc;
     }
 
     public boolean supportsActions() {

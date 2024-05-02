@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.AxisAngle4d;
 import org.joml.Quaterniond;
 import org.joml.Quaternionf;
 
@@ -29,8 +28,6 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final ModelResourceLocation WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "wings_controller_inventory", "inventory");
     public static final ResourceLocation WINGS_TEXTURE = new ResourceLocation(MODID, "textures/entity/wings_controller.png");
 
-    private static final Vec3 UNIT_VECTOR = new Vec3(1, 0, 0);
-    
     public WingsItemStackRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
@@ -58,17 +55,18 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
 
     // called externally
     public static void crystalRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, LivingEntity entity, int combinedLightIn, int combinedOverlayIn) {
-        double partialTicks = Minecraft.getInstance().getPartialTick();
-        cap.updatePartialTicks(partialTicks);
+        float partialTicks = Minecraft.getInstance().getPartialTick();
+        cap.prepareForRender(partialTicks, entity);
 
         for (WingsCapability.Crystal crystal : cap.getCrystals()) {
-            Vec3 entityVelocity = entity.getDeltaMovement();
+            Vec3 entityPosition = entity.getPosition(partialTicks);
+            // TODO compensate for z & x rot when elytra flying
             double entityRot = Mth.lerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
             float entityRotF = (float) entityRot;
             entityRot = Math.toRadians(entityRot);
 
             // absolute offset so that position lerping works on entity rotation
-            Vec3 offset = crystal.calculateOffset(entityVelocity, entityRot);
+            Vec3 offset = crystal.calculateOffset(entityPosition, entityRot);
 
             poseStack.pushPose();
             poseStack.scale(1, -1, -1);

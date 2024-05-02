@@ -1,15 +1,16 @@
 package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
+import com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
 import com.m_w_k.amethystwings.registry.AmethystWingsRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -33,10 +34,17 @@ public class AmethystWingsMod {
     public void gatherData(GatherDataEvent event) {
         DataGenerator gen = event.getGenerator();
         PackOutput packOutput = gen.getPackOutput();
+        ExistingFileHelper helper = event.getExistingFileHelper();
         gen.addProvider(event.includeServer(), new AmethystWingsRecipeProvider(packOutput));
+        gen.addProvider(event.includeServer(), new AmethystWingsModelProvider(packOutput, helper));
     }
 
     public void onModelRegistration(ModelEvent.RegisterAdditional event) {
         event.register(WingsItemStackRenderer.WINGS_INVENTORY_MODEL);
+        event.register(AmethystWingsModelProvider.RESONANT);
+        event.register(AmethystWingsModelProvider.HARDENED);
+        event.register(AmethystWingsModelProvider.ENERGETIC);
+        event.register(AmethystWingsModelProvider.SHAPED);
+        event.register(AmethystWingsModelProvider.AURIC);
     }
 }

@@ -3,12 +3,17 @@ package com.m_w_k.amethystwings.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.api.util.WingsAction;
+import com.m_w_k.amethystwings.api.util.WingsRenderHelp;
 import com.m_w_k.amethystwings.client.model.CrystalModel;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +23,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
@@ -30,10 +36,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4d;
-import org.joml.Quaterniond;
-import org.joml.Vector3d;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.*;
 
 public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider {
@@ -55,13 +60,19 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private boolean isBlocking;
 
-    private double lastPartialTicks;
     private double partialTicks;
-    private double delta;
     private boolean tickPassed;
+    private boolean needsIteratorRegeneration;
+    private final static PoseStack ELYTRA_HELPER = new PoseStack();
+    private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
+    private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
+    private static Matrix4f RIGHT_WING_MATRIX;
+    private static Matrix4f LEFT_WING_MATRIX;
 
     private double armorToughnessContribution;
-    private static final int MAX_SHIELD_CRYSTALS = 21;
+    private static final int MIN_SHIELD_CRYSTALS = 8;
+    private static final int MAX_SHIELD_CRYSTALS = 20;
+    private static final int MIN_ELYTRA_CRYSTALS = 24;
     private final List<Crystal> crystalsShieldSorted = new ObjectArrayList<>();
     private final List<Crystal> crystalsElytraSorted = new ObjectArrayList<>();
     private final List<Crystal> crystalsElytraSortedActive = new ObjectArrayList<>();
@@ -90,6 +101,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     public void setBlocking(boolean blocking) {
         if (this.isBlocking != blocking) {
+            this.resetCrystalRenderCache();
             this.isBlocking = blocking;
             if (blocking) {
                 // when shielding, crystals that are in the shield can no longer be used for other things.
@@ -113,11 +125,11 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     public boolean canBlock() {
-        return crystalsShieldSorted.size() >= 8;
+        return crystalsShieldSorted.size() >= MIN_SHIELD_CRYSTALS;
     }
 
     public boolean canElytra() {
-        return crystalsElytraSortedActive.size() >= 24;
+        return crystalsElytraSortedActive.size() >= MIN_ELYTRA_CRYSTALS;
     }
 
     public boolean canBoost() {
@@ -186,11 +198,68 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return whole;
     }
 
-    public void updatePartialTicks(double partialTicks) {
-        this.lastPartialTicks = this.partialTicks;
+    public void prepareForRender(double partialTicks, LivingEntity entity) {
+        this.tickPassed = this.partialTicks > partialTicks;
         this.partialTicks = partialTicks;
-        this.tickPassed = this.lastPartialTicks > this.partialTicks;
-        this.delta = this.partialTicks - this.lastPartialTicks + (this.tickPassed ? 1 : 0);
+        if (needsIteratorRegeneration) {
+            WingsRenderHelp.regenerateIterators();
+            needsIteratorRegeneration = false;
+        }
+        setupAnim(entity);
+    }
+
+    /**
+     * Ripped directly from {@link net.minecraft.client.model.ElytraModel}
+     */
+    private void setupAnim(LivingEntity entity) {
+        float f = 0.2617994F;
+        float f1 = -0.2617994F;
+        float f2 = 0.0F;
+        float f3 = 0.0F;
+        if (entity.isFallFlying()) {
+            float f4 = 1.0F;
+            Vec3 vec3 = entity.getDeltaMovement();
+            if (vec3.y < 0.0D) {
+                Vec3 vec31 = vec3.normalize();
+                f4 = 1.0F - (float)Math.pow(-vec31.y, 1.5D);
+            }
+
+            f = f4 * 0.34906584F + (1.0F - f4) * f;
+            f1 = f4 * (-(float)Math.PI / 2F) + (1.0F - f4) * f1;
+        } else if (entity.isCrouching()) {
+            f = 0.6981317F;
+            f1 = (-(float)Math.PI / 4F);
+            f2 = 3.0F;
+            f3 = 0.08726646F;
+        }
+
+        LEFT_FAKE_WING.y = f2;
+        if (entity instanceof AbstractClientPlayer abstractclientplayer) {
+            abstractclientplayer.elytraRotX += (f - abstractclientplayer.elytraRotX) * 0.1F;
+            abstractclientplayer.elytraRotY += (f3 - abstractclientplayer.elytraRotY) * 0.1F;
+            abstractclientplayer.elytraRotZ += (f1 - abstractclientplayer.elytraRotZ) * 0.1F;
+            LEFT_FAKE_WING.xRot = abstractclientplayer.elytraRotX;
+            LEFT_FAKE_WING.yRot = abstractclientplayer.elytraRotY;
+            LEFT_FAKE_WING.zRot = abstractclientplayer.elytraRotZ;
+        } else {
+            LEFT_FAKE_WING.xRot = f;
+            LEFT_FAKE_WING.zRot = f1;
+            LEFT_FAKE_WING.yRot = f3;
+        }
+
+        RIGHT_FAKE_WING.yRot = -LEFT_FAKE_WING.yRot;
+        RIGHT_FAKE_WING.y = LEFT_FAKE_WING.y;
+        RIGHT_FAKE_WING.xRot = LEFT_FAKE_WING.xRot;
+        RIGHT_FAKE_WING.zRot = -LEFT_FAKE_WING.zRot;
+
+        ELYTRA_HELPER.pushPose();
+        RIGHT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
+        RIGHT_WING_MATRIX = ELYTRA_HELPER.last().pose();
+        ELYTRA_HELPER.popPose();
+        ELYTRA_HELPER.pushPose();
+        LEFT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
+        LEFT_WING_MATRIX = ELYTRA_HELPER.last().pose();
+        ELYTRA_HELPER.popPose();
     }
 
     @Override
@@ -396,8 +465,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
                     this.armorToughnessContribution, AttributeModifier.Operation.ADDITION));
         }
-        this.crystals.forEach(crystal -> crystal.cachedTarget = null);
         initActiveLists();
+        resetCrystalRenderCache();
+    }
+
+    protected void resetCrystalRenderCache() {
+        this.crystals.forEach(crystal -> crystal.cachedTarget = null);
+        this.needsIteratorRegeneration = true;
     }
 
     @Override
@@ -423,14 +497,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public class Crystal {
 
         private final CrystalModel model;
-        private boolean isMirrored;
 
-        private static final double LERP_FACTOR = 1;
+        private static final double LERP_FACTOR = 0.5;
         private final Quaterniond lastRotation = new Quaterniond();
-        private Vec3 cachedPosition = new Vec3(0, 0, 0);
         private Vec3 lastPosition = new Vec3(0, 0, 0);
-        private CrystalTarget cachedTarget;
-        private final Vector3d entityVelocity = new Vector3d();
+        private WingsRenderHelp.CrystalTarget cachedTarget;
+
+        private static final Quaternionf Y180 = new Quaternionf(0, 1, 0, 0);
 
 
         public final ItemStack crystalStack;
@@ -450,50 +523,52 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             return partialTicks * LERP_FACTOR;
         }
 
-        private CrystalTarget resolveTarget() {
-            if (this.cachedTarget == null) {
-                this.cachedTarget = new CrystalTarget(new Vec3(0, 0, -1),
-                        new Quaterniond(new AxisAngle4d(1, 1, 0, 0)));
+        private WingsRenderHelp.CrystalTarget resolveTarget() {
+            if (this.cachedTarget == null && isBlocking && crystalsShieldSorted.contains(this)) {
+                var iter = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.SHIELD);
+                if (iter.hasNext()) this.cachedTarget = iter.next();
             }
+
+            if (this.cachedTarget == null) {
+                var iter = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.IDLE);
+                if (iter.hasNext()) this.cachedTarget = iter.next();
+            }
+
+            // fallback
+            if (this.cachedTarget == null)
+                this.cachedTarget = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.NONE).get(0);
             return this.cachedTarget;
         }
 
-        public Vec3 calculateOffset(Vec3 entityVelocity, double entityRot) {
+        public Vec3 calculateOffset(Vec3 entityPosition, double entityRot) {
             // code from Vec3, but collated to reduce instantiation count.
             double f = Math.cos(-entityRot);
             double f1 = Math.sin(-entityRot);
-            Vec3 target = resolveTarget().targetPosition;
+            Vec3 target = resolveTarget().targetPosition();
+            if (resolveTarget().group().isElytraAttached())
+                target = transformOffset(target);
+
             double x = target.x() * f + target.z() * f1;
             double y = target.y();
             double z = target.z() * f - target.x() * f1;
 
-            this.lerpVelocity(entityVelocity);
-            x -= this.log(this.entityVelocity.x());
-            y -= this.log(this.entityVelocity.y());
-            z -= this.log(this.entityVelocity.z());
-
-            return this.lerpPosition(new Vec3(x, y, z));
+            return this.lerpPosition(new Vec3(x + entityPosition.x(), y + entityPosition.y(), z + entityPosition.z()), entityPosition);
         }
 
-        private double log(double value) {
-            return Math.log1p(Math.abs(value)) * Math.signum(value);
+        private Vec3 transformOffset(Vec3 offset) {
+            Vector3d vec = new Vector3d(offset.x(), offset.y(), offset.z());
+            vec.mulDirection(resolveTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
+            return new Vec3(vec.x(), vec.y(), vec.z());
         }
 
         public Quaterniond calculateRotation(double entityRot) {
-            Quaterniond target = resolveTarget().targetRotation;
+            Quaterniondc target = resolveTarget().targetRotation();
             Quaterniond rot = new Quaterniond(new AxisAngle4d(entityRot, 0, 1, 0));
             return this.lerpRotation(rot.mul(target));
         }
 
-        private void lerpVelocity(Vec3 velocity) {
-            // move entityVelocity delta% of the remaining distance to the target velocity.
-            // should be relatively unaffected by framerate?
-            this.entityVelocity.x = Mth.lerp(delta, this.entityVelocity.x(), velocity.x());
-            this.entityVelocity.y = Mth.lerp(delta, this.entityVelocity.y(), velocity.y());
-            this.entityVelocity.z = Mth.lerp(delta, this.entityVelocity.z(), velocity.z());
-        }
-
-        private Vec3 lerpPosition(Vec3 target) {
+        private Vec3 lerpPosition(Vec3 target, Vec3 entityPosition) {
+            verifyPositionCache(target);
             if (tickPassed) {
                 this.lastPosition = new Vec3(
                         Mth.lerp(LERP_FACTOR, this.lastPosition.x(), target.x()),
@@ -501,13 +576,18 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
                         Mth.lerp(LERP_FACTOR, this.lastPosition.z(), target.z())
                 );
             }
-            this.cachedPosition = target;
             return new Vec3(
-                    Mth.lerp(partialTicksC(), this.lastPosition.x(), target.x()),
-                    Mth.lerp(partialTicksC(), this.lastPosition.y(), target.y()),
-                    Mth.lerp(partialTicksC(), this.lastPosition.z(), target.z())
+                    Mth.lerp(partialTicksC(), this.lastPosition.x(), target.x()) - entityPosition.x(),
+                    Mth.lerp(partialTicksC(), this.lastPosition.y(), target.y()) - entityPosition.y(),
+                    Mth.lerp(partialTicksC(), this.lastPosition.z(), target.z()) - entityPosition.z()
             );
 
+        }
+
+        private void verifyPositionCache(Vec3 target) {
+            if (this.lastPosition.vectorTo(target).lengthSqr() > 2) {
+                this.lastPosition = target;
+            }
         }
 
         private Quaterniond lerpRotation(Quaterniond target) {
@@ -517,7 +597,15 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         }
 
         public void render(PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-            this.model.render(poseStack, buffer.getBuffer(RenderType.entitySolid(crystalItem.getWingsRenderTexture())), combinedLightIn, combinedOverlayIn, isMirrored);
+            poseStack.pushPose();
+            poseStack.translate(0.5, 0.5, 0.5);
+            if (this.resolveTarget().isMirrored()) {
+                poseStack.mulPose(Y180);
+            }
+            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+            BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(crystalItem.getWingsModelLoc());
+            renderer.render(stack, ItemDisplayContext.NONE, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
+            poseStack.popPose();
         }
 
         public int getDurabilityRemaining() {
@@ -539,16 +627,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         public void shatter() {
             isShattered = true;
             shatteredCrystals.add(this);
-        }
-    }
-
-    protected static class CrystalTarget {
-        public Vec3 targetPosition;
-        public Quaterniond targetRotation;
-
-        public CrystalTarget(Vec3 targetPosition, Quaterniond targetRotation) {
-            this.targetPosition = targetPosition;
-            this.targetRotation = targetRotation;
         }
     }
 }

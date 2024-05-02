@@ -1,0 +1,6 @@
+{
+  "parent": "amethystwings:entity/crystal",
+  "textures": {
+    "layer0": "amethystwings:entity/auric_crystal"
+  }
+}

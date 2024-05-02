@@ -1,0 +1,10 @@
+{
+    "sources": [
+        {
+            "type": "directory",
+            "namespace": "amethystwings",
+            "source": "entity",
+            "prefix": "entity/"
+        }
+    ]
+}

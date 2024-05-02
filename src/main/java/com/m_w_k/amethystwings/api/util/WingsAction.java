@@ -6,10 +6,17 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 public enum WingsAction {
-    SHIELD, ELYTRA, BOOST, NONE;
+    // useful keys
+    SHIELD, ELYTRA, BOOST, NONE,
+    // keys used for internal logic
+    IDLE, SHIELD_IDLE;
 
     public boolean isNone() {
         return this == NONE;
+    }
+
+    public boolean isElytraAttached() {
+        return this == ELYTRA || this == BOOST || this == IDLE;
     }
 
     public void appendHoverText(List<Component> components) {
