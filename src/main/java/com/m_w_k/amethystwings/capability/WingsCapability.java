@@ -3,8 +3,7 @@ package com.m_w_k.amethystwings.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.api.util.WingsAction;
-import com.m_w_k.amethystwings.api.util.WingsRenderHelp;
-import com.m_w_k.amethystwings.client.model.CrystalModel;
+import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -20,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -34,6 +34,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -62,7 +63,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private double partialTicks;
     private boolean tickPassed;
-    private boolean needsIteratorRegeneration;
+    private boolean crouching;
+    private boolean crystalRenderCacheInvalid = true;
     private final static PoseStack ELYTRA_HELPER = new PoseStack();
     private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
     private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
@@ -73,11 +75,14 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private static final int MIN_SHIELD_CRYSTALS = 8;
     private static final int MAX_SHIELD_CRYSTALS = 20;
     private static final int MIN_ELYTRA_CRYSTALS = 24;
-    private final List<Crystal> crystalsShieldSorted = new ObjectArrayList<>();
-    private final List<Crystal> crystalsElytraSorted = new ObjectArrayList<>();
-    private final List<Crystal> crystalsElytraSortedActive = new ObjectArrayList<>();
-    private final List<Crystal> crystalsBoostSorted = new ObjectArrayList<>();
-    private final List<Crystal> crystalsBoostSortedActive = new ObjectArrayList<>();
+    private static final int MAX_ELYTRA_CRYSTALS = 24;
+    private static final int MIN_BOOST_CRYSTALS = 1;
+    private static final int MAX_BOOST_CRYSTALS = 4;
+    private final SortedCrystalList crystalsShieldSorted = new SortedCrystalList();
+    private final SortedCrystalList crystalsElytraSorted = new SortedCrystalList();
+    private final SortedCrystalList crystalsElytraSortedActive = new SortedCrystalList();
+    private final SortedCrystalList crystalsBoostSorted = new SortedCrystalList();
+    private final SortedCrystalList crystalsBoostSortedActive = new SortedCrystalList();
     private final List<Crystal> crystals = new ObjectArrayList<>();
     private final List<Crystal> shatteredCrystals = new ObjectArrayList<>();
 
@@ -101,31 +106,47 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     public void setBlocking(boolean blocking) {
         if (this.isBlocking != blocking) {
-            this.resetCrystalRenderCache();
+            this.invalidateCrystalRenderCache();
             this.isBlocking = blocking;
-            if (blocking) {
-                // when shielding, crystals that are in the shield can no longer be used for other things.
-                crystalsBoostSortedActive.clear();
-                crystalsBoostSortedActive.addAll(crystalsBoostSorted);
-                crystalsBoostSortedActive.removeAll(crystalsShieldSorted);
-                crystalsElytraSortedActive.clear();
-                crystalsElytraSortedActive.addAll(crystalsElytraSorted);
-                crystalsElytraSortedActive.removeAll(crystalsShieldSorted);
-            } else {
-                initActiveLists();
-            }
+            initActiveLists();
         }
     }
 
     private void initActiveLists() {
+        invalidateCrystalRenderCache();
         crystalsBoostSortedActive.clear();
-        crystalsBoostSortedActive.addAll(crystalsBoostSorted);
+        crystalsBoostSortedActive.addAll(crystalsBoostSorted.manyAction);
         crystalsElytraSortedActive.clear();
-        crystalsElytraSortedActive.addAll(crystalsElytraSorted);
+        crystalsElytraSortedActive.addAll(crystalsElytraSorted.manyAction);
+        if (this.isBlocking) {
+            // when blocking, crystals that are in the shield cannot be used.
+            crystalsBoostSortedActive.removeAll(crystalsShieldSorted.manyAction);
+            crystalsElytraSortedActive.removeAll(crystalsShieldSorted.manyAction);
+        }
+
+        if (crystalsElytraSortedActive.size() + crystalsElytraSorted.singleAction.size() >= MIN_ELYTRA_CRYSTALS) {
+            // we can form a full elytra, prioritize
+            crystalsElytraSortedActive.addAll(crystalsElytraSorted.singleAction, false);
+            crystalsElytraSortedActive.truncate(MAX_ELYTRA_CRYSTALS);
+            crystalsBoostSortedActive.removeAll(crystalsElytraSortedActive.manyAction);
+            crystalsBoostSortedActive.truncate(MAX_BOOST_CRYSTALS);
+        } else {
+            // otherwise, prioritize boost
+            crystalsBoostSortedActive.addAll(crystalsBoostSorted.singleAction, false);
+            crystalsBoostSortedActive.truncate(MAX_BOOST_CRYSTALS);
+            crystalsElytraSortedActive.removeAll(crystalsBoostSortedActive.manyAction);
+            crystalsElytraSortedActive.truncate(MAX_ELYTRA_CRYSTALS);
+        }
+    }
+
+    private static void truncateList(List<?> list, int maxSize) {
+        if (list.size() > maxSize) {
+            list.subList(maxSize, list.size()).clear();
+        }
     }
 
     public boolean canBlock() {
-        return crystalsShieldSorted.size() >= MIN_SHIELD_CRYSTALS;
+        return crystalsShieldSorted.fullList.size() >= MIN_SHIELD_CRYSTALS;
     }
 
     public boolean canElytra() {
@@ -133,13 +154,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     public boolean canBoost() {
-        return crystalsBoostSortedActive.size() > 0;
+        return crystalsBoostSortedActive.size() >= MIN_BOOST_CRYSTALS;
     }
 
     public void takeBlockDamage(double incomingDamage, boolean shatter, Runnable onExcessDamage) {
         // 1 point of incoming damage = 3 durability damage
         int damage = applyDamageReduction(incomingDamage * 3, true);
-        Iterator<Crystal> shieldCrystals = crystalsShieldSorted.iterator();
+        Iterator<Crystal> shieldCrystals = crystalsShieldSorted.fullList.iterator();
         int guaranteedShatter = shatter ? 10 : 0;
         while (shieldCrystals.hasNext() && damage > 0) {
             Crystal crystal = shieldCrystals.next();
@@ -150,7 +171,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             }
             damage = crystal.damage(damage);
         }
-        onContentsChanged();
         if (damage > 0)
             onExcessDamage.run();
         handleShatteredCrystals();
@@ -171,12 +191,12 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     private void weightedDamageElytraCrystal() {
-        double sumDurability = crystalsElytraSortedActive.stream().map(Crystal::getDurabilityRemaining)
+        double sumDurability = crystalsElytraSortedActive.fullList.stream().map(Crystal::getDurabilityRemaining)
                 .reduce(Integer::sum).orElse(0);
         if (sumDurability == 0) return;
         double selector = Math.random();
         double discovered = 0;
-        for (Crystal crystal : crystalsElytraSortedActive) {
+        for (Crystal crystal : crystalsElytraSortedActive.fullList) {
             discovered += crystal.getDurabilityRemaining() / sumDurability;
             if (discovered > selector) {
                 // no need to handle excess damage, it won't occur.
@@ -201,11 +221,52 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public void prepareForRender(double partialTicks, LivingEntity entity) {
         this.tickPassed = this.partialTicks > partialTicks;
         this.partialTicks = partialTicks;
-        if (needsIteratorRegeneration) {
-            WingsRenderHelp.regenerateIterators();
-            needsIteratorRegeneration = false;
-        }
+        this.crouching = entity.hasPose(Pose.CROUCHING);
+        if (crystalRenderCacheInvalid) rebuildCrystalRenderCache();
         setupAnim(entity);
+    }
+
+    private void rebuildCrystalRenderCache() {
+        Iterator<WingsRenderHelper.CrystalTarget> iter;
+        List<Crystal> assignedCrystals = new ObjectArrayList<>();
+        if (isBlocking) {
+            iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.SHIELD);
+            for (Crystal crystal : crystalsShieldSorted.fullList) {
+                if (!iter.hasNext()) break;
+                crystal.cachedTarget = iter.next();
+                assignedCrystals.add(crystal);
+            }
+        } else {
+            iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.SHIELD_IDLE);
+            for (Crystal crystal : crystalsShieldSorted.singleAction) {
+                if (!iter.hasNext()) break;
+                crystal.cachedTarget = iter.next();
+                assignedCrystals.add(crystal);
+            }
+        }
+
+        iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.ELYTRA);
+        for (Crystal crystal : crystalsElytraSortedActive.fullList) {
+            if (!iter.hasNext()) break;
+            crystal.cachedTarget = iter.next();
+            assignedCrystals.add(crystal);
+        }
+
+        iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.BOOST);
+        for (Crystal crystal : crystalsBoostSortedActive.fullList) {
+            if (!iter.hasNext()) break;
+            crystal.cachedTarget = iter.next();
+            assignedCrystals.add(crystal);
+        }
+
+        iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.IDLE);
+        for (Crystal crystal : crystals) {
+            if (assignedCrystals.contains(crystal)) continue;
+            if (!iter.hasNext()) break;
+            crystal.cachedTarget = iter.next();
+        }
+
+        crystalRenderCacheInvalid = false;
     }
 
     /**
@@ -453,25 +514,24 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
                 }
             }
         }
-        // make sure we sort in descending order, not ascending.
-        this.crystalsShieldSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
-        if (this.crystalsShieldSorted.size() > MAX_SHIELD_CRYSTALS) {
-            this.crystalsShieldSorted.subList(MAX_SHIELD_CRYSTALS, this.crystalsShieldSorted.size()).clear();
-        }
-        this.crystalsElytraSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
-        this.crystalsBoostSorted.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+        this.crystalsShieldSorted.truncate(MAX_SHIELD_CRYSTALS);
+        this.crystalsElytraSorted.sort();
+        this.crystalsBoostSorted.sort();
         if (this.armorToughnessContribution > 0) {
             this.attributes.removeAll(Attributes.ARMOR_TOUGHNESS);
             this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
                     this.armorToughnessContribution, AttributeModifier.Operation.ADDITION));
         }
         initActiveLists();
-        resetCrystalRenderCache();
     }
 
-    protected void resetCrystalRenderCache() {
+    /**
+     * Call this whenever the positions of crystals should change.
+     */
+    protected void invalidateCrystalRenderCache() {
+        if (this.crystalRenderCacheInvalid) return;
         this.crystals.forEach(crystal -> crystal.cachedTarget = null);
-        this.needsIteratorRegeneration = true;
+        this.crystalRenderCacheInvalid = true;
     }
 
     @Override
@@ -489,19 +549,23 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
      * Should always be called after crystals are damaged for any reason.
      */
     private void handleShatteredCrystals() {
-        for (Crystal crystal : shatteredCrystals) {
-            this.setStackInSlot(crystal.slot, ItemStack.EMPTY);
+        if (shatteredCrystals.size() == 0) {
+            onContentsChanged();
+            return;
         }
+        NonNullList<ItemStack> itemStacks = getItemList();
+        for (Crystal crystal : shatteredCrystals) {
+            itemStacks.set(crystal.slot, stack);
+        }
+        setItemList(itemStacks);
     }
 
     public class Crystal {
 
-        private final CrystalModel model;
-
-        private static final double LERP_FACTOR = 0.5;
         private final Quaterniond lastRotation = new Quaterniond();
         private Vec3 lastPosition = new Vec3(0, 0, 0);
-        private WingsRenderHelp.CrystalTarget cachedTarget;
+        private Vec3 targetPosition = new Vec3(0, 0, 0);
+        private WingsRenderHelper.CrystalTarget cachedTarget;
 
         private static final Quaternionf Y180 = new Quaternionf(0, 1, 0, 0);
 
@@ -512,31 +576,20 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         public boolean isShattered = false;
 
-        protected Crystal(ItemStack stack, int slot) {
+        protected Crystal(@NotNull ItemStack stack, int slot) {
             this.slot = slot;
             this.crystalStack = stack;
             this.crystalItem = (WingsCrystalItem) stack.getItem();
-            this.model = new CrystalModel(CrystalModel.createLayer().bakeRoot());
         }
 
-        private double partialTicksC() {
-            return partialTicks * LERP_FACTOR;
+        public boolean singleAction() {
+            return this.crystalItem.supportsActions() && this.crystalItem.getSupportedActions().size() == 1;
         }
 
-        private WingsRenderHelp.CrystalTarget resolveTarget() {
-            if (this.cachedTarget == null && isBlocking && crystalsShieldSorted.contains(this)) {
-                var iter = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.SHIELD);
-                if (iter.hasNext()) this.cachedTarget = iter.next();
-            }
-
-            if (this.cachedTarget == null) {
-                var iter = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.IDLE);
-                if (iter.hasNext()) this.cachedTarget = iter.next();
-            }
-
+        public WingsRenderHelper.CrystalTarget resolveTarget() {
             // fallback
             if (this.cachedTarget == null)
-                this.cachedTarget = WingsRenderHelp.CRYSTAL_POSITIONS.get(WingsAction.NONE).get(0);
+                this.cachedTarget = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.NONE).get(0);
             return this.cachedTarget;
         }
 
@@ -555,7 +608,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             return this.lerpPosition(new Vec3(x + entityPosition.x(), y + entityPosition.y(), z + entityPosition.z()), entityPosition);
         }
 
-        private Vec3 transformOffset(Vec3 offset) {
+        @Contract("_ -> new")
+        private @NotNull Vec3 transformOffset(@NotNull Vec3 offset) {
             Vector3d vec = new Vector3d(offset.x(), offset.y(), offset.z());
             vec.mulDirection(resolveTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
             return new Vec3(vec.x(), vec.y(), vec.z());
@@ -563,45 +617,43 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         public Quaterniond calculateRotation(double entityRot) {
             Quaterniondc target = resolveTarget().targetRotation();
+            if (this.resolveTarget().group().isElytraAttached()) {
+                Matrix4f matrix = (this.resolveTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
+                target = matrix.get(new Matrix4d()).rotate(target).getNormalizedRotation(new Quaterniond());
+            }
             Quaterniond rot = new Quaterniond(new AxisAngle4d(entityRot, 0, 1, 0));
             return this.lerpRotation(rot.mul(target));
         }
 
-        private Vec3 lerpPosition(Vec3 target, Vec3 entityPosition) {
-            verifyPositionCache(target);
+        @Contract("_, _ -> new")
+        private @NotNull Vec3 lerpPosition(Vec3 target, Vec3 entityPosition) {
             if (tickPassed) {
-                this.lastPosition = new Vec3(
-                        Mth.lerp(LERP_FACTOR, this.lastPosition.x(), target.x()),
-                        Mth.lerp(LERP_FACTOR, this.lastPosition.y(), target.y()),
-                        Mth.lerp(LERP_FACTOR, this.lastPosition.z(), target.z())
-                );
+                this.lastPosition = this.targetPosition;
+                this.targetPosition = target;
             }
             return new Vec3(
-                    Mth.lerp(partialTicksC(), this.lastPosition.x(), target.x()) - entityPosition.x(),
-                    Mth.lerp(partialTicksC(), this.lastPosition.y(), target.y()) - entityPosition.y(),
-                    Mth.lerp(partialTicksC(), this.lastPosition.z(), target.z()) - entityPosition.z()
+                    Mth.lerp(partialTicks, this.lastPosition.x(), targetPosition.x()) - entityPosition.x(),
+                    Mth.lerp(partialTicks, this.lastPosition.y(), targetPosition.y()) - entityPosition.y(),
+                    Mth.lerp(partialTicks, this.lastPosition.z(), targetPosition.z()) - entityPosition.z()
             );
 
         }
 
-        private void verifyPositionCache(Vec3 target) {
-            if (this.lastPosition.vectorTo(target).lengthSqr() > 2) {
-                this.lastPosition = target;
-            }
-        }
-
-        private Quaterniond lerpRotation(Quaterniond target) {
+        private Quaterniond lerpRotation(@NotNull Quaterniond target) {
             target.normalize();
-            if (tickPassed) this.lastRotation.nlerp(target, LERP_FACTOR);
-            return this.lastRotation.nlerp(target, partialTicksC(), new Quaterniond());
+            if (tickPassed) this.lastRotation.nlerp(target, 0.5);
+            return this.lastRotation.nlerp(target, 0.5 * partialTicks, new Quaterniond());
         }
 
-        public void render(PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+        public void render(@NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
             poseStack.pushPose();
-            poseStack.translate(0.5, 0.5, 0.5);
+            if (crouching && this.resolveTarget().group().isElytraAttached()) {
+                poseStack.translate(0, -1.5/16d, -1/16d);
+            }
             if (this.resolveTarget().isMirrored()) {
                 poseStack.mulPose(Y180);
             }
+            poseStack.translate(0.5, 0.5, 0.5);
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
             BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(crystalItem.getWingsModelLoc());
             renderer.render(stack, ItemDisplayContext.NONE, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
@@ -627,6 +679,93 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         public void shatter() {
             isShattered = true;
             shatteredCrystals.add(this);
+        }
+    }
+
+    protected class SortedCrystalList {
+        public List<Crystal> fullList = new ObjectArrayList<>();
+        public List<Crystal> singleAction = new ObjectArrayList<>();
+        public List<Crystal> manyAction = new ObjectArrayList<>();
+
+        public SortedCrystalList() {}
+
+        /**
+         * Sort should be called manually after all crystals are added
+         */
+        public void add(Crystal crystal) {
+            fullList.add(crystal);
+        }
+
+        /**
+         * Sorts automatically
+         */
+        public void addAll(Collection<? extends Crystal> crystals) {
+            addAll(crystals, true);
+        }
+
+        public void addAll(Collection<? extends Crystal> crystals, boolean sort) {
+            fullList.addAll(crystals);
+            if (sort) sort();
+        }
+
+        /**
+         * Sorts automatically
+         */
+        public void removeAll(Collection<? extends Crystal> crystals) {
+            removeAll(crystals, true);
+        }
+
+        public void removeAll(Collection<? extends Crystal> crystals, boolean sort) {
+            fullList.removeAll(crystals);
+            if (sort) sort();
+        }
+
+        /**
+         * Sorts automatically
+         */
+        public void truncate(int maxSize) {
+            sortAlt();
+            truncateList(fullList, maxSize);
+            sort();
+        }
+
+        public int size() {
+            return fullList.size();
+        }
+
+        public void clear() {
+            fullList.clear();
+            singleAction.clear();
+            manyAction.clear();
+        }
+
+        /**
+         * Sort in descending order, prioritizing single action crystals.
+         */
+        public void sortAlt() {
+            this.singleAction.clear();
+            this.manyAction.clear();
+            this.fullList.sort(Comparator.comparingInt(a -> -(a.singleAction() ? 1000000 : 0) -
+                    a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+            for (Crystal crystal : fullList) {
+                if (crystal.singleAction()) this.singleAction.add(crystal);
+                else this.manyAction.add(crystal);
+            }
+
+        }
+
+        /**
+         * Sort in descending order
+         */
+        public void sort() {
+            this.singleAction.clear();
+            this.manyAction.clear();
+            this.fullList.sort(Comparator.comparingInt(a -> -a.crystalItem.getPriority() * 1000 + a.crystalStack.getDamageValue()));
+            for (Crystal crystal : fullList) {
+                if (crystal.singleAction()) this.singleAction.add(crystal);
+                else this.manyAction.add(crystal);
+            }
+
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import static com.m_w_k.amethystwings.api.util.WingsAction.*;
 
-public class WingsRenderHelp {
+public class WingsRenderHelper {
     private static double[] CONSTS = new double[] {
             -8/16d, // 0, y offset for shield center
             10/16d, // 1, z offset for shield center
@@ -20,8 +20,9 @@ public class WingsRenderHelp {
             0.25/16d, // 5, y offset as shield crystals run right to left
             0.25/16d, // 6, x offset as shield crystals run up to down
 
-            1/16d, // 7, first idle crystal y offset
-            -2/16d, // 8, first idle crystal z offset
+            6/16d, // 7, first idle crystal x offset
+            -4/16d, // 8, first idle crystal y offset
+            -8/16d, // 9, first idle crystal z offset
     };
     private static Vec3[] VEC_3S = new Vec3[] {
             v(0, 0, 0), // 0, fallback position
@@ -48,12 +49,13 @@ public class WingsRenderHelp {
             v(2*CONSTS[2] + 2*CONSTS[6], CONSTS[0] + 2*CONSTS[3] + 2*CONSTS[5], CONSTS[1] - 2*CONSTS[4]), // 20, offset for shield UP RIGHT
             v(-2*CONSTS[2] + 2*CONSTS[6], CONSTS[0] + 2*CONSTS[3] - 2*CONSTS[5], CONSTS[1] - 2*CONSTS[4]), // 21, offset for shield UP LEFT
 
-            v(0, CONSTS[7], CONSTS[8]) // 22, offset for first idle
+            v(CONSTS[7], CONSTS[8], CONSTS[9]), // 22, offset for first idle left
+            v(-CONSTS[7], CONSTS[8], CONSTS[9]), // 23, offset for first idle right
     };
     private static Quaterniondc[] QUATERNIONS = new Quaterniondc[] {
             new Quaterniond(), // 0, fallback rot
             new Quaterniond(1, 0, 1, 0).normalize(), // 1, shield crystal rot
-            new Quaterniond(0, 0, 0, 1).normalize(), // 2, idle crystal rot
+            new Quaterniond(0, 0, 1, 0), // 2, idle crystal rot
     };
     public static final EnumMap<WingsAction, CrystalTargetIterable> CRYSTAL_POSITIONS = new EnumMap<>(WingsAction.class) {{
         this.put(NONE, new CrystalTargetIterable(NONE)
@@ -81,19 +83,25 @@ public class WingsRenderHelp {
                 .with(VEC_3S[20], QUATERNIONS[1])
                 .with(VEC_3S[21], QUATERNIONS[1])
         );
+        this.put(SHIELD_IDLE, new CrystalTargetIterable(SHIELD_IDLE));
         this.put(IDLE, new CrystalTargetIterable(IDLE)
-                .with(VEC_3S[22], QUATERNIONS[2], false)
-                .with(VEC_3S[22], QUATERNIONS[2], true, 1)
+                .with(VEC_3S[22], QUATERNIONS[2])
+                .with(VEC_3S[23], QUATERNIONS[2], 1)
         );
+        this.put(ELYTRA, new CrystalTargetIterable(ELYTRA));
+        this.put(BOOST, new CrystalTargetIterable(BOOST));
 
         CONSTS = null;
         VEC_3S = null;
         QUATERNIONS = null;
-    }};
-
-    public static void regenerateIterators() {
-        CRYSTAL_POSITIONS.values().stream().filter(Objects::nonNull).forEach(CrystalTargetIterable::regenerateIterator);
     }
+
+        @Override
+        public CrystalTargetIterable get(Object key) {
+            var fetch = super.get(key);
+            return fetch == null ? null : fetch.regenerateIterator();
+        }
+    };
 
     private static Vec3 v(double x, double y, double z) {
         return new Vec3(x, y, z);
@@ -111,8 +119,9 @@ public class WingsRenderHelp {
             this.group = group;
         }
 
-        protected void regenerateIterator() {
+        protected CrystalTargetIterable regenerateIterator() {
             this.iterator = this.iterator();
+            return this;
         }
 
         public CrystalTargetIterable with(Vec3 targetPosition, Quaterniondc targetRotation) {

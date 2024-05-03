@@ -8,7 +8,7 @@ import java.util.List;
 public enum WingsAction {
     // useful keys
     SHIELD, ELYTRA, BOOST, NONE,
-    // keys used for internal logic
+    // keys used for render logic
     IDLE, SHIELD_IDLE;
 
     public boolean isNone() {
