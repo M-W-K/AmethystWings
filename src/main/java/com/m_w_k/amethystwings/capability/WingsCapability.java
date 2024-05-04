@@ -63,6 +63,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private double partialTicks;
     private boolean tickPassed;
+    private Vec3 lastEntityLocation = new Vec3(0, 0, 0);
+    private final Vector3d drift = new Vector3d();
     private boolean crouching;
     private boolean crystalRenderCacheInvalid = true;
     private final static PoseStack ELYTRA_HELPER = new PoseStack();
@@ -220,10 +222,22 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     public void prepareForRender(double partialTicks, LivingEntity entity) {
         this.tickPassed = this.partialTicks > partialTicks;
+        double delta = partialTicks - this.partialTicks + (this.tickPassed ? 1 : 0);
         this.partialTicks = partialTicks;
         this.crouching = entity.hasPose(Pose.CROUCHING);
+        Vec3 entityLocation = entity.getPosition((float) partialTicks);
+        this.drift.set(
+                -log((entityLocation.x() - lastEntityLocation.x()) / delta) / 8,
+                -log((entityLocation.y() - lastEntityLocation.y()) / delta) / 8,
+                -log((entityLocation.z() - lastEntityLocation.z()) / delta) / 8
+        );
+        this.lastEntityLocation = entityLocation;
         if (crystalRenderCacheInvalid) rebuildCrystalRenderCache();
         setupAnim(entity);
+    }
+
+    private static double log(double num) {
+        return Math.log1p(Math.abs(num)) * Math.signum(num);
     }
 
     private void rebuildCrystalRenderCache() {
@@ -586,55 +600,55 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             return this.crystalItem.supportsActions() && this.crystalItem.getSupportedActions().size() == 1;
         }
 
-        public WingsRenderHelper.CrystalTarget resolveTarget() {
+        public WingsRenderHelper.CrystalTarget getTarget() {
             // fallback
             if (this.cachedTarget == null)
                 this.cachedTarget = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.NONE).get(0);
             return this.cachedTarget;
         }
 
-        public Vec3 calculateOffset(Vec3 entityPosition, double entityRot) {
+        public Vec3 calculateOffset(double entityRot) {
             // code from Vec3, but collated to reduce instantiation count.
             double f = Math.cos(-entityRot);
             double f1 = Math.sin(-entityRot);
-            Vec3 target = resolveTarget().targetPosition();
-            if (resolveTarget().group().isElytraAttached())
+            Vec3 target = getTarget().targetPosition();
+            if (getTarget().group().isElytraAttached())
                 target = transformOffset(target);
 
             double x = target.x() * f + target.z() * f1;
             double y = target.y();
             double z = target.z() * f - target.x() * f1;
 
-            return this.lerpPosition(new Vec3(x + entityPosition.x(), y + entityPosition.y(), z + entityPosition.z()), entityPosition);
+            return this.lerpPosition(new Vec3(x, y, z));
         }
 
         @Contract("_ -> new")
         private @NotNull Vec3 transformOffset(@NotNull Vec3 offset) {
             Vector3d vec = new Vector3d(offset.x(), offset.y(), offset.z());
-            vec.mulDirection(resolveTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
+            vec.mulDirection(getTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
             return new Vec3(vec.x(), vec.y(), vec.z());
         }
 
         public Quaterniond calculateRotation(double entityRot) {
-            Quaterniondc target = resolveTarget().targetRotation();
-            if (this.resolveTarget().group().isElytraAttached()) {
-                Matrix4f matrix = (this.resolveTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
+            Quaterniondc target = getTarget().targetRotation();
+            if (this.getTarget().group().isElytraAttached()) {
+                Matrix4f matrix = (this.getTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
                 target = matrix.get(new Matrix4d()).rotate(target).getNormalizedRotation(new Quaterniond());
             }
             Quaterniond rot = new Quaterniond(new AxisAngle4d(entityRot, 0, 1, 0));
             return this.lerpRotation(rot.mul(target));
         }
 
-        @Contract("_, _ -> new")
-        private @NotNull Vec3 lerpPosition(Vec3 target, Vec3 entityPosition) {
+        @Contract("_ -> new")
+        private @NotNull Vec3 lerpPosition(Vec3 target) {
             if (tickPassed) {
                 this.lastPosition = this.targetPosition;
                 this.targetPosition = target;
             }
             return new Vec3(
-                    Mth.lerp(partialTicks, this.lastPosition.x(), targetPosition.x()) - entityPosition.x(),
-                    Mth.lerp(partialTicks, this.lastPosition.y(), targetPosition.y()) - entityPosition.y(),
-                    Mth.lerp(partialTicks, this.lastPosition.z(), targetPosition.z()) - entityPosition.z()
+                    Mth.lerp(partialTicks, this.lastPosition.x(), targetPosition.x()) + drift.x(),
+                    Mth.lerp(partialTicks, this.lastPosition.y(), targetPosition.y()) + drift.y(),
+                    Mth.lerp(partialTicks, this.lastPosition.z(), targetPosition.z()) + drift.z()
             );
 
         }
@@ -647,10 +661,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         public void render(@NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
             poseStack.pushPose();
-            if (crouching && this.resolveTarget().group().isElytraAttached()) {
+            if (crouching && this.getTarget().group().isElytraAttached()) {
                 poseStack.translate(0, -1.5/16d, -1/16d);
             }
-            if (this.resolveTarget().isMirrored()) {
+            if (this.getTarget().isMirrored()) {
                 poseStack.mulPose(Y180);
             }
             poseStack.translate(0.5, 0.5, 0.5);

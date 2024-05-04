@@ -59,14 +59,13 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
         cap.prepareForRender(partialTicks, entity);
 
         for (WingsCapability.Crystal crystal : cap.getCrystals()) {
-            Vec3 entityPosition = entity.getPosition(partialTicks);
             // TODO compensate for z & x rot when elytra flying
             double entityRot = Mth.lerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
             float entityRotF = (float) entityRot;
             entityRot = Math.toRadians(entityRot);
 
             // absolute offset so that position lerping works on entity rotation
-            Vec3 offset = crystal.calculateOffset(entityPosition, entityRot);
+            Vec3 offset = crystal.calculateOffset(entityRot);
 
             poseStack.pushPose();
             poseStack.scale(1, -1, -1);
