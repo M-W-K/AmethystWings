@@ -582,6 +582,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         private WingsRenderHelper.CrystalTarget cachedTarget;
 
         private static final Quaternionf Y180 = new Quaternionf(0, 1, 0, 0);
+        private static final Matrix4f HELPER = new Matrix4f();
+        private static final Matrix4f HELPER2 = new Matrix4f();
 
 
         public final ItemStack crystalStack;
@@ -607,36 +609,28 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             return this.cachedTarget;
         }
 
-        public Vec3 calculateOffset(double entityRot) {
-            // code from Vec3, but collated to reduce instantiation count.
-            double f = Math.cos(-entityRot);
-            double f1 = Math.sin(-entityRot);
-            Vec3 target = getTarget().targetPosition();
-            if (getTarget().group().isElytraAttached())
-                target = transformOffset(target);
-
-            double x = target.x() * f + target.z() * f1;
-            double y = target.y();
-            double z = target.z() * f - target.x() * f1;
-
-            return this.lerpPosition(new Vec3(x, y, z));
+        public Vec3 calculateOffset(Matrix4f rot) {
+            Vector3f target = getTarget().targetPosition().toVector3f();
+            boolean leftWing = getTarget().misc() == 0;
+            if (getTarget().group().isElytraAttached()) {
+                // correction that probably belongs at a different step but IDK where
+                if (crouching) target.add(leftWing ? -3/16f : 3/16f, 4/16f, -4/16f);
+                target.mulDirection(leftWing ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
+            }
+            rot.transformDirection(target);
+            return this.lerpPosition(new Vec3(target.x(), target.y(), target.z()));
         }
 
-        @Contract("_ -> new")
-        private @NotNull Vec3 transformOffset(@NotNull Vec3 offset) {
-            Vector3d vec = new Vector3d(offset.x(), offset.y(), offset.z());
-            vec.mulDirection(getTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
-            return new Vec3(vec.x(), vec.y(), vec.z());
-        }
-
-        public Quaterniond calculateRotation(double entityRot) {
+        public Quaterniond calculateRotation(Matrix4f rot) {
             Quaterniondc target = getTarget().targetRotation();
+            Quaterniond out;
             if (this.getTarget().group().isElytraAttached()) {
                 Matrix4f matrix = (this.getTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
-                target = matrix.get(new Matrix4d()).rotate(target).getNormalizedRotation(new Quaterniond());
-            }
-            Quaterniond rot = new Quaterniond(new AxisAngle4d(entityRot, 0, 1, 0));
-            return this.lerpRotation(rot.mul(target));
+                out = matrix.get(new Matrix4d()).rotate(target).getNormalizedRotation(new Quaterniond());
+            } else out = target.get(new Quaterniond());
+            // why can I not transform quaternions by a matrix directly smh
+            out = this.lerpRotation(out.get(HELPER).mul(rot.invert(HELPER2)).getNormalizedRotation(out));
+            return out.get(HELPER).mul(rot).getNormalizedRotation(out);
         }
 
         @Contract("_ -> new")
@@ -661,9 +655,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         public void render(@NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
             poseStack.pushPose();
-            if (crouching && this.getTarget().group().isElytraAttached()) {
-                poseStack.translate(0, -1.5/16d, -1/16d);
-            }
             if (this.getTarget().isMirrored()) {
                 poseStack.mulPose(Y180);
             }

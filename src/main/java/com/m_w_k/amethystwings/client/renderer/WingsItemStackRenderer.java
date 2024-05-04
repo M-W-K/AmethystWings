@@ -3,7 +3,7 @@ package com.m_w_k.amethystwings.client.renderer;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.model.WingsModel;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.joml.Quaterniond;
 import org.joml.Quaternionf;
 
@@ -57,30 +58,32 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static void crystalRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, LivingEntity entity, int combinedLightIn, int combinedOverlayIn) {
         float partialTicks = Minecraft.getInstance().getPartialTick();
         cap.prepareForRender(partialTicks, entity);
+        PoseStack.Pose livingEntityRendererPose = poseStack.last();
+        poseStack.popPose();
+        // find the matrix that goes from the current pose to the livingEntityRenderer pose via inversion.
+        Matrix4f matrix = poseStack.last().pose().invert(new Matrix4f());
+        matrix.mul(livingEntityRendererPose.pose());
+        Transformation transformation = new Transformation(matrix);
 
         for (WingsCapability.Crystal crystal : cap.getCrystals()) {
-            // TODO compensate for z & x rot when elytra flying
-            double entityRot = Mth.lerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-            float entityRotF = (float) entityRot;
-            entityRot = Math.toRadians(entityRot);
 
             // absolute offset so that position lerping works on entity rotation
-            Vec3 offset = crystal.calculateOffset(entityRot);
+            Vec3 offset = crystal.calculateOffset(matrix); // TODO crouch is weird
 
             poseStack.pushPose();
-            poseStack.scale(1, -1, -1);
-            poseStack.mulPose(Axis.YP.rotationDegrees(entityRotF));
             poseStack.translate(offset.x(), offset.y(), offset.z());
-
+            poseStack.pushTransformation(transformation); // reintroduce the LivingEntityRenderer's effects
             poseStack.pushPose();
-            poseStack.scale(1, -1, -1);
-            Quaterniond rot = crystal.calculateRotation(entityRot);
+
+            Quaterniond rot = crystal.calculateRotation(matrix);
             poseStack.mulPose(rot.get(new Quaternionf()));
 
             crystal.render(poseStack, buffer, combinedLightIn, combinedOverlayIn);
 
             poseStack.popPose();
             poseStack.popPose();
+            poseStack.popPose();
         }
+        poseStack.pushTransformation(transformation); // restore the LivingEntityRenderer's pose
     }
 }

@@ -12,17 +12,20 @@ import static com.m_w_k.amethystwings.api.util.WingsAction.*;
 
 public class WingsRenderHelper {
     private static double[] CONSTS = new double[] {
-            -8/16d, // 0, y offset for shield center
-            10/16d, // 1, z offset for shield center
+            8/16d, // 0, y offset for shield center
+            -10/16d, // 1, z offset for shield center
             3.5/16d, // 2, x offset between horizontal shield layers
-            5.5/16d, // 3, y offset between vertical shield layers
+            -5.5/16d, // 3, y offset between vertical shield layers
             0, // 4, z offset between vertical shield layers
-            0.25/16d, // 5, y offset as shield crystals run right to left
+            -0.25/16d, // 5, y offset as shield crystals run right to left
             0.25/16d, // 6, x offset as shield crystals run up to down
 
             6/16d, // 7, first idle crystal x offset
-            -4/16d, // 8, first idle crystal y offset
-            -8/16d, // 9, first idle crystal z offset
+            4/16d, // 8, first idle crystal y offset
+            8/16d, // 9, first idle crystal z offset
+            6/16d, // 10, first idle crystal x offset
+            4/16d, // 11, first idle crystal y offset
+            13/16d, // 12, first idle crystal z offset
     };
     private static Vec3[] VEC_3S = new Vec3[] {
             v(0, 0, 0), // 0, fallback position
@@ -51,6 +54,8 @@ public class WingsRenderHelper {
 
             v(CONSTS[7], CONSTS[8], CONSTS[9]), // 22, offset for first idle left
             v(-CONSTS[7], CONSTS[8], CONSTS[9]), // 23, offset for first idle right
+            v(CONSTS[10], CONSTS[11], CONSTS[12]), // 24, offset for second idle left
+            v(-CONSTS[10], CONSTS[11], CONSTS[12]), // 25, offset for second idle right
     };
     private static Quaterniondc[] QUATERNIONS = new Quaterniondc[] {
             new Quaterniond(), // 0, fallback rot
@@ -87,6 +92,8 @@ public class WingsRenderHelper {
         this.put(IDLE, new CrystalTargetIterable(IDLE)
                 .with(VEC_3S[22], QUATERNIONS[2])
                 .with(VEC_3S[23], QUATERNIONS[2], 1)
+                .with(VEC_3S[24], QUATERNIONS[2])
+                .with(VEC_3S[25], QUATERNIONS[2], 1)
         );
         this.put(ELYTRA, new CrystalTargetIterable(ELYTRA));
         this.put(BOOST, new CrystalTargetIterable(BOOST));

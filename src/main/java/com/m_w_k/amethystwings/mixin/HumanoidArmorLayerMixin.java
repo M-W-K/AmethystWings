@@ -32,17 +32,12 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, M extends 
         if (slot == EquipmentSlot.CHEST) {
             ItemStack stackOffhand = entity.getOffhandItem();
             if (stackOffhand.getItem() instanceof WingsItem item) {
-                amethystWings$renderWings(item.getCapability(stackOffhand), poseStack, buffer, entity, p_117123_);
+                WingsItemStackRenderer.crystalRender(item.getCapability(stackOffhand), poseStack, buffer, entity, p_117123_, NO_OVERLAY);
                 return;
             }
             ItemStack stackMainhand = entity.getMainHandItem();
             if (stackMainhand.getItem() instanceof WingsItem item)
-                amethystWings$renderWings(item.getCapability(stackMainhand), poseStack, buffer, entity, p_117123_);
+                WingsItemStackRenderer.crystalRender(item.getCapability(stackMainhand), poseStack, buffer, entity, p_117123_, NO_OVERLAY);
         }
-    }
-
-    @Unique
-    private void amethystWings$renderWings(WingsCapability cap, PoseStack poseStack, MultiBufferSource buffer, T entity, int p_117123_) {
-        WingsItemStackRenderer.crystalRender(cap, poseStack, buffer, entity, p_117123_, NO_OVERLAY);
     }
 }
