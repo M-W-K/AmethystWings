@@ -41,7 +41,7 @@ public final class EventHandler {
                         knockback = () -> doKnockback(defender, new Vec3(defender.getX() - attacker.getX(), 0, defender.getZ() - attacker.getZ()));
                     }
                 }
-                cap.takeBlockDamage(event.getBlockedDamage(), shatter, knockback);
+                cap.takeBlockDamage(defender, event.getBlockedDamage(), shatter, knockback);
                 if (shatter) COOLDOWNED_WINGS.add(() -> ((Player) defender).getCooldowns().removeCooldown(item));
             }
         }

@@ -16,7 +16,7 @@ public enum WingsAction {
     }
 
     public boolean isElytraAttached() {
-        return this == ELYTRA || this == BOOST || this == IDLE;
+        return this == ELYTRA || this == IDLE;
     }
 
     public void appendHoverText(List<Component> components) {

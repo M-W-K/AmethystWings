@@ -31,6 +31,11 @@ public class WingsCrystalItem extends Item {
         this.wingsModelLoc = wingsModelLoc;
     }
 
+    @Override
+    public boolean isEnchantable(@NotNull ItemStack p_41456_) {
+        return false;
+    }
+
     public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
         this(properties, priority, mass, 0, wingsRenderTexture, supportedAction, supportedActions);
     }

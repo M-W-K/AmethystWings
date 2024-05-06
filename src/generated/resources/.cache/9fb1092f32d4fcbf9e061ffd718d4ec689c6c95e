@@ -1,4 +1,4 @@
-// 1.20.1	2024-04-29T16:55:47.888275	Recipes
+// 1.20.1	2024-05-05T18:48:48.380742	Recipes
 a6e850a4a233da4b788a29311a861d7b6cf31aa1 data/amethystwings/advancements/recipes/misc/auric_amethyst.json
 91ebf5befe619dc3583c60cd3b7758ad6af0d57f data/amethystwings/advancements/recipes/misc/energetic_amethyst.json
 404d8ec5375894d638aceff7340a9713a571361e data/amethystwings/advancements/recipes/misc/hardened_amethyst.json
@@ -11,5 +11,5 @@ ffd8a9c273dcc5f0837ec3dae1bd2e3bb1d1eab1 data/amethystwings/recipes/auric_amethy
 ddb4009e0553ca8f5639004b5643ef316002955c data/amethystwings/recipes/hardened_amethyst.json
 e3e9b2d61994357aefab6ec77cd228de8f8db289 data/amethystwings/recipes/resonant_amethyst.json
 823e1e90b6acceb58650153b3ce18197dabe9444 data/amethystwings/recipes/shaped_amethyst.json
-133ce4ae964f9312f4886474d16f8067b5632212 data/amethystwings/recipes/treated_amethyst.json
+4e777c6bd2aabd764831de657005c70823b2ed20 data/amethystwings/recipes/treated_amethyst.json
 7e48c316e05fd6bca734e0e56e41f2e67ee39b7d data/amethystwings/recipes/wings_controller.json

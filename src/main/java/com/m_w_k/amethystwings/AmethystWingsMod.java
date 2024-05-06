@@ -3,6 +3,7 @@ package com.m_w_k.amethystwings;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
+import com.m_w_k.amethystwings.network.PacketHandler;
 import com.m_w_k.amethystwings.registry.AmethystWingsRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.data.DataGenerator;
@@ -23,6 +24,8 @@ public class AmethystWingsMod {
 
     public AmethystWingsMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        PacketHandler.init();
 
         AmethystWingsRegistry.init(modEventBus);
         modEventBus.addListener(this::gatherData);

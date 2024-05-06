@@ -4,6 +4,7 @@
   "package": "com.m_w_k.amethystwings.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ExperienceOrbMixin",
     "LivingEntityMixin",
     "PlayerMixin"
   ],

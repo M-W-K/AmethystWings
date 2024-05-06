@@ -7,5 +7,6 @@ public class AmethystWingsRegistry {
         AmethystWingsItemsRegistry.ITEMS.register(modEventBus);
         AmethystWingsGUIRegistry.MENU_TYPES.register(modEventBus);
         AmethystWingsCreativeTabsRegistry.CREATIVE_MODE_TABS.register(modEventBus);
+        AmethystWingsSoundsRegistry.SOUNDS.register(modEventBus);
     }
 }

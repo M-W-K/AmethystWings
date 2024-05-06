@@ -24,7 +24,7 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(Items.AMETHYST_SHARD))
                 .save(writer);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.TREATED_AMETHYST.get(), 2)
-                .requires(Items.AMETHYST_SHARD).requires(Items.GLOWSTONE_DUST)
+                .requires(Items.AMETHYST_SHARD).requires(Items.COPPER_INGOT).requires(Items.GLOWSTONE_DUST)
                 .requires(Items.REDSTONE).requires(Items.GUNPOWDER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(Items.AMETHYST_SHARD))
                 .save(writer);

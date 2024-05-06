@@ -1,0 +1,10 @@
+{
+  "crystal_shatter": {
+    "subtitle": "amethystwings.subtitle.crystal_shatter",
+    "sounds": [ "amethystwings:crystal_shatter" ]
+  },
+  "crystal_damage": {
+    "subtitle": "amethystwings.subtitle.crystal_damage",
+    "sounds": [ "amethystwings:crystal_damage" ]
+  }
+}

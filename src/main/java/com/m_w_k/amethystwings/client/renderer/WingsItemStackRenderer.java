@@ -14,6 +14,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -58,24 +59,24 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static void crystalRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, LivingEntity entity, int combinedLightIn, int combinedOverlayIn) {
         float partialTicks = Minecraft.getInstance().getPartialTick();
         cap.prepareForRender(partialTicks, entity);
-        PoseStack.Pose livingEntityRendererPose = poseStack.last();
+        PoseStack.Pose poseTop = poseStack.last();
         poseStack.popPose();
-        // find the matrix that goes from the current pose to the livingEntityRenderer pose via inversion.
-        Matrix4f matrix = poseStack.last().pose().invert(new Matrix4f());
-        matrix.mul(livingEntityRendererPose.pose());
-        Transformation transformation = new Transformation(matrix);
+        PoseStack.Pose poseLER = poseStack.last();
+        // find the matrix that goes from the LivingEntityRenderer pose to the top pose via inversion.
+        Matrix4f matrixLER = poseLER.pose().invert(new Matrix4f());
+        matrixLER.mul(poseTop.pose());
+        Transformation transformationLER = new Transformation(matrixLER);
 
         for (WingsCapability.Crystal crystal : cap.getCrystals()) {
-
+            poseStack.pushPose();
             // absolute offset so that position lerping works on entity rotation
-            Vec3 offset = crystal.calculateOffset(matrix); // TODO crouch is weird
-
-            poseStack.pushPose();
+            Vec3 offset = crystal.calculateOffset(matrixLER); // TODO fix crouch lerping
             poseStack.translate(offset.x(), offset.y(), offset.z());
-            poseStack.pushTransformation(transformation); // reintroduce the LivingEntityRenderer's effects
+            // restore the top pose
+            poseStack.pushTransformation(transformationLER);
             poseStack.pushPose();
 
-            Quaterniond rot = crystal.calculateRotation(matrix);
+            Quaterniond rot = crystal.calculateRotation(matrixLER); // TODO fix rot lerping
             poseStack.mulPose(rot.get(new Quaternionf()));
 
             crystal.render(poseStack, buffer, combinedLightIn, combinedOverlayIn);
@@ -84,6 +85,7 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
             poseStack.popPose();
             poseStack.popPose();
         }
-        poseStack.pushTransformation(transformation); // restore the LivingEntityRenderer's pose
+        // restore the top pose
+        poseStack.pushTransformation(transformationLER);
     }
 }
