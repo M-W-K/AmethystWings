@@ -8,10 +8,13 @@ import com.m_w_k.amethystwings.registry.AmethystWingsRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -43,7 +46,8 @@ public class AmethystWingsMod {
     }
 
     public void onModelRegistration(ModelEvent.RegisterAdditional event) {
-        event.register(WingsItemStackRenderer.WINGS_INVENTORY_MODEL);
+        ResourceLocation loc = DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> WingsItemStackRenderer::getWingsInventoryModel);
+        if (loc != null) event.register(loc);
         event.register(AmethystWingsModelProvider.RESONANT);
         event.register(AmethystWingsModelProvider.HARDENED);
         event.register(AmethystWingsModelProvider.ENERGETIC);

@@ -5,9 +5,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.AxisAngle4d;
 import org.joml.Quaternionf;
 
+@OnlyIn(Dist.CLIENT)
 public class WingsModel {
     private final ModelPart front_brace;
     private final ModelPart back_brace;

@@ -27,6 +27,7 @@ import org.joml.Quaternionf;
 
 import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 
+@OnlyIn(Dist.CLIENT)
 public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final WingsModel WINGS_MODEL = new WingsModel(WingsModel.createLayer().bakeRoot());
     public static final ModelResourceLocation WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "wings_controller_inventory", "inventory");
@@ -89,5 +90,9 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
         }
         // restore the top pose
         poseStack.pushTransformation(transformationLER);
+    }
+
+    public static ResourceLocation getWingsInventoryModel() {
+        return WINGS_INVENTORY_MODEL;
     }
 }
