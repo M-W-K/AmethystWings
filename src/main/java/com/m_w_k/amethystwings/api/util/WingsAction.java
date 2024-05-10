@@ -15,10 +15,6 @@ public enum WingsAction {
         return this == NONE;
     }
 
-    public boolean isElytraAttached() {
-        return this == ELYTRA || this == IDLE;
-    }
-
     public void appendHoverText(List<Component> components) {
         components.add(Component.translatable("item.amethystwings.wings_controller.action." + this.name().toLowerCase()).withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
     }

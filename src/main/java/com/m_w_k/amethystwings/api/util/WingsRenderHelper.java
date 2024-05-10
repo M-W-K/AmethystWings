@@ -100,33 +100,33 @@ public class WingsRenderHelper {
     };
 
     private static Quaterniondc[] QUATERNIONS = new Quaterniondc[] {
-            new Quaterniond(), // 0, fallback rot
+            q(0, 0, 0, 1), // 0, fallback rot
 
-            new Quaterniond(1, 0, 1, 0).normalize(), // 1, shield crystal rot
+            q(1, 0, 1, 0), // 1, shield crystal rot
 
-            new Quaterniond(1, 1, -1, 1).normalize(), // 2, elytra first left crystal rot
-            new Quaterniond(1, -1, 1, 1).normalize(), // 3, elytra first right crystal rot
-            new Quaterniond(0.2, -1, 0.2, 1).normalize(), // 4, elytra second left crystal rot
-            new Quaterniond(0.2, 1, -0.2, 1).normalize(), // 5, elytra second right crystal rot
-            new Quaterniond(1, -0.1, 1, 0.1).normalize(), // 6, elytra third left crystal rot
-            new Quaterniond(1, 0.1, -1, 0.1).normalize(), // 7, elytra third right crystal rot
-            new Quaterniond(-1, -0.2, -1, 0.2).normalize(), // 8, elytra fourth left crystal rot
-            new Quaterniond(-1, 0.2, 1, 0.2).normalize(), // 9, elytra fourth right crystal rot
-            new Quaterniond(-1, 0.2, 1, 0.2).normalize(), // 10, elytra fifth left crystal rot
-            new Quaterniond(-1, -0.2, -1, 0.2).normalize(), // 11, elytra fifth right crystal rot
-            new Quaterniond(-0.9, 1, 0.9, 1).normalize(), // 12, elytra sixth left crystal rot
-            new Quaterniond(-0.9, -1, -0.9, 1).normalize(), // 13, elytra sixth right crystal rot
-            new Quaterniond(0, 1, 0, 1).normalize(), // 14, elytra seventh left crystal rot
-            new Quaterniond(0, -1, 0, 1).normalize(), // 15, elytra seventh right crystal rot
-            new Quaterniond(0.4, -1, 0.4, 1).normalize(), // 16, elytra eighth left crystal rot
-            new Quaterniond(0.4, 1, -0.4, 1).normalize(), // 17, elytra eighth right crystal rot
-            new Quaterniond(1, 0.1, -1, 0.1).normalize(), // 18, elytra third left crystal rot
-            new Quaterniond(1, -0.1, 1, 0.1).normalize(), // 19, elytra third right crystal rot
+            q(1, 1, -1, 1), // 2, elytra first left crystal rot
+            q(1, -1, 1, 1), // 3, elytra first right crystal rot
+            q(0.2, -1, 0.2, 1), // 4, elytra second left crystal rot
+            q(0.2, 1, -0.2, 1), // 5, elytra second right crystal rot
+            q(1, -0.1, 1, 0.1), // 6, elytra third left crystal rot
+            q(1, 0.1, -1, 0.1), // 7, elytra third right crystal rot
+            q(-1, -0.2, -1, 0.2), // 8, elytra fourth left crystal rot
+            q(-1, 0.2, 1, 0.2), // 9, elytra fourth right crystal rot
+            q(-1, 0.2, 1, 0.2), // 10, elytra fifth left crystal rot
+            q(-1, -0.2, -1, 0.2), // 11, elytra fifth right crystal rot
+            q(-0.9, 1, 0.9, 1), // 12, elytra sixth left crystal rot
+            q(-0.9, -1, -0.9, 1), // 13, elytra sixth right crystal rot
+            q(0, 1, 0, 1), // 14, elytra seventh left crystal rot
+            q(0, -1, 0, 1), // 15, elytra seventh right crystal rot
+            q(0.4, -1, 0.4, 1), // 16, elytra eighth left crystal rot
+            q(0.4, 1, -0.4, 1), // 17, elytra eighth right crystal rot
+            q(1, 0.1, -1, 0.1), // 18, elytra third left crystal rot
+            q(1, -0.1, 1, 0.1), // 19, elytra third right crystal rot
 
-            new Quaterniond(0, 0.2, 0, 1).normalize(), // 20, boost first right crystal rot
-            new Quaterniond(0, -0.2, 0, 1).normalize(), // 21, boost first left crystal rot
-            new Quaterniond(0, 1, 0, 0.2).normalize(), // 22, boost second right crystal rot
-            new Quaterniond(0, -1, 0, 0.2).normalize(), // 23, boost second left crystal rot
+            q(0, 0.2, 0, 1), // 20, boost first right crystal rot
+            q(0, -0.2, 0, 1), // 21, boost first left crystal rot
+            q(0, 1, 0, 0.2), // 22, boost second right crystal rot
+            q(0, -1, 0, 0.2), // 23, boost second left crystal rot
     };
 
     public static final EnumMap<WingsAction, CrystalTargetIterable> CRYSTAL_POSITIONS = new EnumMap<>(WingsAction.class) {{
@@ -156,8 +156,9 @@ public class WingsRenderHelper {
                 .with(VEC_3S[21], QUATERNIONS[1])
         );
         this.put(SHIELD_IDLE, new CrystalTargetIterable(SHIELD_IDLE));
-        this.put(IDLE, new CrystalTargetIterable(IDLE));
-        this.put(ELYTRA, new CrystalTargetIterable(ELYTRA)
+        this.put(IDLE, new CrystalTargetIterable(IDLE) // 28 unique positions 54 total I want to die
+        );
+        this.put(ELYTRA, new CrystalTargetIterable(ELYTRA).defaultElytraAttached(true)
                 .with(VEC_3S[22], QUATERNIONS[2])
                 .with(VEC_3S[23], QUATERNIONS[3], 1)
                 .with(VEC_3S[24], QUATERNIONS[4])
@@ -199,12 +200,17 @@ public class WingsRenderHelper {
     private static Vec3 v(double x, double y, double z) {
         return new Vec3(x, y, z);
     }
+    
+    private static Quaterniondc q(double x, double y, double z, double w) {
+        return new Quaterniond(x, y, z, w).normalize();
+    }
 
-    public record CrystalTarget(Vec3 targetPosition, Quaterniondc targetRotation, WingsAction group, byte misc) {}
+    public record CrystalTarget(Vec3 targetPosition, Quaterniondc targetRotation, WingsAction group, byte misc, boolean elytraAttached) {}
 
     public static class CrystalTargetIterable extends ObjectArrayList<CrystalTarget> implements Iterator<CrystalTarget> {
 
         private final WingsAction group;
+        private boolean defaultElytraAttached = false;
         private Iterator<CrystalTarget> iterator;
         
         public CrystalTargetIterable(WingsAction group) {
@@ -216,12 +222,21 @@ public class WingsRenderHelper {
             return this;
         }
 
+        public CrystalTargetIterable defaultElytraAttached(boolean elytraAttached) {
+            this.defaultElytraAttached = elytraAttached;
+            return this;
+        }
+
         public CrystalTargetIterable with(Vec3 targetPosition, Quaterniondc targetRotation) {
             return this.with(targetPosition, targetRotation, 0);
         }
 
         public CrystalTargetIterable with(Vec3 targetPosition, Quaterniondc targetRotation, int misc) {
-            this.add(new CrystalTarget(targetPosition, targetRotation, this.group, (byte) misc));
+            return this.with(targetPosition, targetRotation, misc, defaultElytraAttached);
+        }
+
+        public CrystalTargetIterable with(Vec3 targetPosition, Quaterniondc targetRotation, int misc, boolean elytraAttached) {
+            this.add(new CrystalTarget(targetPosition, targetRotation, this.group, (byte) misc, elytraAttached));
             return this;
         }
 

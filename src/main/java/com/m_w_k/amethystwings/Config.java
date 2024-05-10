@@ -1,61 +1,71 @@
 package com.m_w_k.amethystwings;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config
 {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-            .comment("Whether to log the dirt block on common setup")
-            .define("logDirtBlock", true);
+    private static final ForgeConfigSpec.DoubleValue RESONANT_TOUGHNESS = BUILDER
+            .comment("Toughness gained per slotted resonant crystal")
+            .defineInRange("resonantToughness", 0.1d, 0d, 10d);
 
-    private static final ForgeConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-            .comment("A magic number")
-            .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
+    private static final ForgeConfigSpec.DoubleValue AURIC_TOUGHNESS = BUILDER
+            .comment("Toughness gained per slotted auric crystal")
+            .defineInRange("auricToughness", 0.5d, 0d, 10d);
 
-    public static final ForgeConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-            .comment("What you want the introduction message to be for the magic number")
-            .define("magicNumberIntroduction", "The magic number is... ");
+    private static final ForgeConfigSpec.BooleanValue SHIELD_BREAK_COOLDOWN = BUILDER
+            .comment("Whether shield-breaking hits should force wings into cooldown")
+            .define("shieldBreakCooldown", false);
 
-    // a list of strings that are treated as resource locations for items
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
-            .comment("A list of items to log on common setup.")
-            .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
+    private static final ForgeConfigSpec.IntValue SHIELD_BREAK_MASS_DAMAGE = BUILDER
+            .comment("Mass damage dealt by shield-breaking hits. Mass damage to crystals occurs before normal damage.")
+            .defineInRange("shieldBreakMassDamage", 10, 0, 100);
+
+    private static final ForgeConfigSpec.IntValue RESONANT_MASS = BUILDER
+            .comment("Mass of resonant crystals")
+            .defineInRange("resonantMass", 5, 1, 100);
+
+    private static final ForgeConfigSpec.IntValue HARDENED_MASS = BUILDER
+            .comment("Mass of hardened crystals")
+            .defineInRange("hardenedMass", 10, 1, 100);
+
+    private static final ForgeConfigSpec.IntValue BOOST_DAMAGE = BUILDER
+            .comment("Damage dealt to boost crystals on boost")
+            .defineInRange("boostDamage", 60, 0, Integer.MAX_VALUE);
+
+    private static final ForgeConfigSpec.BooleanValue ALT_BOOST_DAMAGE = BUILDER
+            .comment("Whether the alternate method of dealing boost damage should be used")
+            .define("altBoostDamage", false);
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
+    public static double resonantToughness;
+    public static double auricToughness;
 
-    private static boolean validateItemName(final Object obj)
-    {
-        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
-    }
+    public static boolean shieldBreakCooldown;
+    public static int shieldBreakMassDamage;
+    public static int resonantMass;
+    public static int hardenedMass;
+
+    public static int boostDamage;
+    public static boolean altBoostDamage;
 
     @SubscribeEvent
-    static void onLoad(final ModConfigEvent event)
-    {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
+    static void onLoad(final ModConfigEvent event) {
+        resonantToughness = RESONANT_TOUGHNESS.get();
+        auricToughness = AURIC_TOUGHNESS.get();
 
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream()
-                .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
-                .collect(Collectors.toSet());
+        shieldBreakCooldown = SHIELD_BREAK_COOLDOWN.get();
+        shieldBreakMassDamage = SHIELD_BREAK_MASS_DAMAGE.get();
+        resonantMass = RESONANT_MASS.get();
+        hardenedMass = HARDENED_MASS.get();
+
+        boostDamage = BOOST_DAMAGE.get();
+        altBoostDamage = ALT_BOOST_DAMAGE.get();
     }
 }

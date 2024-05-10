@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.m_w_k.amethystwings.Config;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
@@ -18,11 +19,8 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.particles.ItemParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -55,9 +53,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private final Multimap<Attribute, AttributeModifier> attributes = HashMultimap.create(1,1);
 
     public static final WingsCapability EMPTY = new WingsCapability();
-
-    public static final int DURABILITY = 2 * 2 * 3 * 5;
-    public static final int DURABILITY_S = 5 * 2 * 3 * 5;
 
     private final Integer dataKey;
     private final WingsCapDataCache.WingsCapData data;
@@ -193,9 +188,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     public void takeBoostDamage(@NotNull LivingEntity owningEntity) {
-        Iterator<Crystal> boostCrystals = crystalsBoostSortedActive.fullList.iterator();
-        if (!boostCrystals.hasNext()) return;
-        boostCrystals.next().damage(owningEntity, applyDamageReduction(owningEntity, 60, false));
+        if (Config.altBoostDamage) {
+            weightedDamage(owningEntity, crystalsBoostSortedActive.fullList, Config.boostDamage, false);
+        } else {
+            Iterator<Crystal> boostCrystals = crystalsBoostSortedActive.fullList.iterator();
+            if (!boostCrystals.hasNext()) return;
+            boostCrystals.next().damage(owningEntity, applyDamageReduction(owningEntity, Config.boostDamage, false));
+        }
         handleShatteredCrystals(owningEntity);
     }
 
@@ -203,7 +202,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         // 1 point of incoming damage = 3 durability damage
         int damage = applyDamageReduction(owningEntity, incomingDamage * 3, true);
         Iterator<Crystal> shieldCrystals = crystalsShieldSorted.fullList.iterator();
-        int guaranteedShatter = shatter ? 10 : 0;
+        int guaranteedShatter = shatter ? Config.shieldBreakMassDamage : 0;
         while (shieldCrystals.hasNext() && damage > 0) {
             Crystal crystal = shieldCrystals.next();
             if (guaranteedShatter > 0) {
@@ -285,10 +284,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     private int applyDamageReduction(@NotNull LivingEntity owningEntity, double damage, boolean isBlock) {
-        double unbreaking = this.stack.getEnchantmentLevel(Enchantments.UNBREAKING);
-        if (isBlock) unbreaking /= 2;
-        double divisor = 1 + unbreaking;
-        damage /= divisor;
+        int unbreakingDivisor = 1 + this.stack.getEnchantmentLevel(Enchantments.UNBREAKING);
+        if (isBlock) damage = (damage * 0.4 / unbreakingDivisor) + damage * 0.6;
+        else damage = damage / unbreakingDivisor;
+
         int whole = (int) damage;
         double decimal = damage % 1;
         if (owningEntity.getRandom().nextDouble() < decimal) whole++;
@@ -712,7 +711,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         public Vec3 calculateOffset(Matrix4f rot) {
             Vector3f target = getTarget().targetPosition().toVector3f();
             boolean leftWing = getTarget().misc() == 0;
-            if (getTarget().group().isElytraAttached()) {
+            if (getTarget().elytraAttached()) {
                 // correction that probably belongs at a different step but IDK where
                 if (crouching) target.add(leftWing ? -3/16f : 3/16f, 4/16f, -4/16f);
                 target.mulDirection(leftWing ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
@@ -728,7 +727,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             Quaterniondc target = getTarget().targetRotation();
             // why can I not transform quaternions by a matrix directly smh
             Matrix4f targetAbsolute = target.get(HELPER).mul(rot.invert(HELPER2));
-            if (this.getTarget().group().isElytraAttached()) {
+            if (this.getTarget().elytraAttached()) {
                 Matrix4f matrix = (this.getTarget().misc() == 0 ? LEFT_WING_MATRIX : RIGHT_WING_MATRIX);
                 matrix.mul(targetAbsolute, targetAbsolute);
             }
