@@ -1,6 +1,7 @@
 package com.m_w_k.amethystwings.item;
 
 import com.google.common.collect.Multimap;
+import com.m_w_k.amethystwings.capability.WingsCapDataCache;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.inventory.WingsContainer;
@@ -115,8 +116,7 @@ public class WingsItem extends Item implements Equipable {
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        // TODO write minimal cap information to NBT so server -> client sync works properly
-        return new WingsCapability(stack);
+        return WingsCapDataCache.getCap(stack);
     }
 
     @Override

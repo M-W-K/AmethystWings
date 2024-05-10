@@ -5,11 +5,11 @@
 
 "item.amethystwings.wings_controller":"Amethyst Wings Controller",
 "item.amethystwings.treated_amethyst":"Treated Amethyst Shard",
-"item.amethystwings.resonant_amethyst":"Resonant Amethyst Shard",
-"item.amethystwings.auric_amethyst":"Auric Amethyst Shard",
-"item.amethystwings.hardened_amethyst":"Hardened Amethyst Shard",
-"item.amethystwings.energetic_amethyst":"Energetic Amethyst Shard",
-"item.amethystwings.shaped_amethyst":"Shaped Amethyst Shard",
+"item.amethystwings.resonant_amethyst":"Resonant Amethyst Crystal",
+"item.amethystwings.auric_amethyst":"Auric Amethyst Crystal",
+"item.amethystwings.hardened_amethyst":"Hardened Amethyst Crystal",
+"item.amethystwings.energetic_amethyst":"Energetic Amethyst Crystal",
+"item.amethystwings.shaped_amethyst":"Shaped Amethyst Crystal",
 
   "item.amethystwings.wings_controller.action.shield": "Shield",
   "item.amethystwings.wings_controller.action.elytra": "Elytra",

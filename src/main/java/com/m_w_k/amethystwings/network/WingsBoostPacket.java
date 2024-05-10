@@ -17,7 +17,7 @@ public class WingsBoostPacket extends PacketHandler.AbstractPacket {
         PacketHandler.sendToServer(new WingsBoostPacket(mainHand));
     }
 
-    private WingsBoostPacket(boolean mainHand) {
+    protected WingsBoostPacket(boolean mainHand) {
         this.mainHand = mainHand;
     }
 

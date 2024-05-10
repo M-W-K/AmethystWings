@@ -8,22 +8,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ElytraItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.GameEvent;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -42,13 +34,20 @@ public abstract class LivingEntityMixin extends Entity {
     private boolean extendedElytraCheck(boolean flag) {
         if (flag) return true;
         if (this.getSharedFlag(7) && !this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
-            ItemStack itemStack = this.getItemBySlot(EquipmentSlot.OFFHAND);
-            if (itemStack.getItem() instanceof WingsItem item) {
-                WingsCapability cap = item.getCapability(itemStack);
-                LivingEntity thiss = (LivingEntity) (Object) this;
-                flag = cap.canElytra() && cap.elytraFlightTick(thiss, this.fallFlyTicks);
-            }
+            flag = amethystWings$tryExtendedCheck(EquipmentSlot.MAINHAND);
+            if (!flag) flag = amethystWings$tryExtendedCheck(EquipmentSlot.OFFHAND);
         }
         return flag;
+    }
+
+    @Unique
+    private boolean amethystWings$tryExtendedCheck(EquipmentSlot slot) {
+        ItemStack itemStack = this.getItemBySlot(slot);
+        if (itemStack.getItem() instanceof WingsItem item) {
+            WingsCapability cap = item.getCapability(itemStack);
+            LivingEntity thiss = (LivingEntity) (Object) this;
+            return cap.canElytra() && cap.elytraFlightTick(thiss, this.fallFlyTicks);
+        }
+        return false;
     }
 }

@@ -18,19 +18,19 @@ public abstract class ExperienceOrbMixin {
     private int repairWingsItemInjection(int quant, Player p_147093_) {
         if (quant == 0) return 0;
         ItemStack stack = p_147093_.getMainHandItem();
-        quant = amethystWings$repairWingsItem(stack, quant);
+        quant = amethystWings$repairWingsItem(p_147093_, stack, quant);
         if (quant == 0) return 0;
         stack = p_147093_.getOffhandItem();
-        quant = amethystWings$repairWingsItem(stack, quant);
+        quant = amethystWings$repairWingsItem(p_147093_, stack, quant);
         return quant;
     }
 
     @Unique
-    private int amethystWings$repairWingsItem(ItemStack wingsStack, int amount) {
+    private int amethystWings$repairWingsItem(Player player, ItemStack wingsStack, int amount) {
         if (wingsStack.getItem() instanceof WingsItem item
                 && wingsStack.getEnchantmentLevel(Enchantments.MENDING) > 0) {
             WingsCapability cap = item.getCapability(wingsStack);
-            amount = cap.weightedRepair(cap.getCrystals(), amount, false);
+            amount = cap.weightedRepair(player, cap.getCrystals(), amount, false);
         }
         return amount;
     }
