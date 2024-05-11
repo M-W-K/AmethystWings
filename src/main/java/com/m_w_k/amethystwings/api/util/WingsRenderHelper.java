@@ -47,6 +47,49 @@ public class WingsRenderHelper {
             5/16d, // 30, second boost crystal x offset
             16/16d, // 31, second boost crystal y offset
             4/16d, // 32, second boost crystal z offset
+
+            1/16d, // 33, first idle chain origin x offset
+            -3/16d, // 34, first idle chain origin y offset
+            6/16d, // 35, first idle chain origin z offset
+            0/16d, // 36, x offset between first idle chain crystals
+            -2.5/16d, // 37, y offset between first idle chain crystals
+            4/16d, // 38, z offset between first idle chain crystals
+            3/16d, // 39, second idle chain origin x offset
+            2/16d, // 40, second idle chain origin y offset
+            7/16d, // 41, second idle chain origin z offset
+            1/16d, // 42, x offset between second idle chain crystals
+            -1.5/16d, // 43, y offset between second idle chain crystals
+            5/16d, // 44, z offset between second idle chain crystals
+            4/16d, // 45, third idle chain origin x offset
+            -2/16d, // 46, third idle chain origin y offset
+            10/16d, // 47, third idle chain origin z offset
+            1/16d, // 48, x offset between third idle chain crystals
+            -1.8/16d, // 49, y offset between third idle chain crystals
+            3.5/16d, // 50, z offset between third idle chain crystals
+            4/16d, // 51, fourth idle chain origin x offset
+            8/16d, // 52, fourth idle chain origin y offset
+            7.5/16d, // 53, fourth idle chain origin z offset
+            3/16d, // 54, x offset between fourth idle chain crystals
+            -0.1/16d, // 55, y offset between fourth idle chain crystals
+            3/16d, // 56, z offset between fourth idle chain crystals
+            0.8/16d, // 57, fifth idle chain origin x offset
+            7.3/16d, // 58, fifth idle chain origin y offset
+            8.5/16d, // 59, fifth idle chain origin z offset
+            3/16d, // 60, x offset between fifth idle chain crystals
+            0.1/16d, // 61, y offset between fifth idle chain crystals
+            3/16d, // 62, z offset between fifth idle chain crystals
+            -1.5/16d, // 63, sixth idle chain origin x offset
+            14/16d, // 64, sixth idle chain origin y offset
+            6/16d, // 65, sixth idle chain origin z offset
+            2.5/16d, // 66, x offset between sixth idle chain crystals
+            1.3/16d, // 67, y offset between sixth idle chain crystals
+            3/16d, // 68, z offset between sixth idle chain crystals
+            -1.5/16d, // 69, seventh idle chain origin x offset
+            11/16d, // 70, seventh idle chain origin y offset
+            8/16d, // 71, seventh idle chain origin z offset
+            3/16d, // 72, x offset between seventh idle chain crystals
+            1/16d, // 73, y offset between seventh idle chain crystals
+            5/16d, // 74, z offset between seventh idle chain crystals
     };
 
     private static Vec3[] VEC_3S = new Vec3[] {
@@ -94,9 +137,64 @@ public class WingsRenderHelper {
             v(-CONSTS[25], CONSTS[26], CONSTS[7]), // 39, offset for ninth elytra right
 
             v(CONSTS[27], CONSTS[28], CONSTS[29]), // 40, offset for first boost left
-            v(-CONSTS[27], CONSTS[28], CONSTS[29]), // 41, offset for first boost left
+            v(-CONSTS[27], CONSTS[28], CONSTS[29]), // 41, offset for first boost right
             v(CONSTS[30], CONSTS[31], CONSTS[32]), // 42, offset for second boost left
-            v(-CONSTS[30], CONSTS[31], CONSTS[32]), // 43, offset for second boost left
+            v(-CONSTS[30], CONSTS[31], CONSTS[32]), // 43, offset for second boost right
+
+            v(CONSTS[33], CONSTS[34], CONSTS[35]), // 44, offset for first idle chain left crystal a
+            v(-CONSTS[33], CONSTS[34], CONSTS[35]), // 45, offset for first idle chain right crystal a
+            v(CONSTS[33] + CONSTS[36], CONSTS[34] + CONSTS[37], CONSTS[35] + CONSTS[38]), // 46, offset for first idle chain left crystal b
+            v(-CONSTS[33] - CONSTS[36], CONSTS[34] + CONSTS[37], CONSTS[35] + CONSTS[38]), // 47, offset for first idle chain right crystal b
+            v(CONSTS[33] + 2*CONSTS[36], CONSTS[34] + 2*CONSTS[37], CONSTS[35] + 2*CONSTS[38]), // 48, offset for first idle chain left crystal c
+            v(-CONSTS[33] - 2*CONSTS[36], CONSTS[34] + 2*CONSTS[37], CONSTS[35] + 2*CONSTS[38]), // 49, offset for first idle chain right crystal c
+            v(CONSTS[33] + 3*CONSTS[36], CONSTS[34] + 3*CONSTS[37], CONSTS[35] + 3*CONSTS[38]), // 50, offset for first idle chain left crystal d
+            v(-CONSTS[33] - 3*CONSTS[36], CONSTS[34] + 3*CONSTS[37], CONSTS[35] + 3*CONSTS[38]), // 51, offset for first idle chain right crystal d
+            v(CONSTS[39], CONSTS[40], CONSTS[41]), // 52, offset for second idle chain left crystal a
+            v(-CONSTS[39], CONSTS[40], CONSTS[41]), // 53, offset for second idle chain right crystal a
+            v(CONSTS[39] + CONSTS[42], CONSTS[40] + CONSTS[43], CONSTS[41] + CONSTS[44]), // 54, offset for second idle chain left crystal b
+            v(-CONSTS[39] - CONSTS[42], CONSTS[40] + CONSTS[43], CONSTS[41] + CONSTS[44]), // 55, offset for second idle chain right crystal b
+            v(CONSTS[39] + 2*CONSTS[42], CONSTS[40] + 2*CONSTS[43], CONSTS[41] + 2*CONSTS[44]), // 56, offset for second idle chain left crystal c
+            v(-CONSTS[39] - 2*CONSTS[42], CONSTS[40] + 2*CONSTS[43], CONSTS[41] + 2*CONSTS[44]), // 57, offset for second idle chain right crystal c
+            v(CONSTS[39] + 3*CONSTS[42], CONSTS[40] + 3*CONSTS[43], CONSTS[41] + 3*CONSTS[44]), // 58, offset for second idle chain left crystal d
+            v(-CONSTS[39] - 3*CONSTS[42], CONSTS[40] + 3*CONSTS[43], CONSTS[41] + 3*CONSTS[44]), // 59, offset for second idle chain right crystal d
+            v(CONSTS[45], CONSTS[46], CONSTS[47]), // 60, offset for third idle chain left crystal a
+            v(-CONSTS[45], CONSTS[46], CONSTS[47]), // 61, offset for third idle chain right crystal a
+            v(CONSTS[45] + CONSTS[48], CONSTS[46] + CONSTS[49], CONSTS[47] + CONSTS[50]), // 62, offset for third idle chain left crystal b
+            v(-CONSTS[45] - CONSTS[48], CONSTS[46] + CONSTS[49], CONSTS[47] + CONSTS[50]), // 63, offset for third idle chain right crystal b
+            v(CONSTS[45] + 2*CONSTS[48], CONSTS[46] + 2*CONSTS[49], CONSTS[47] + 2*CONSTS[50]), // 64, offset for third idle chain left crystal c
+            v(-CONSTS[45] - 2*CONSTS[48], CONSTS[46] + 2*CONSTS[49], CONSTS[47] + 2*CONSTS[50]), // 65, offset for third idle chain right crystal c
+            v(CONSTS[45] + 3*CONSTS[48], CONSTS[46] + 3*CONSTS[49], CONSTS[47] + 3*CONSTS[50]), // 66, offset for third idle chain left crystal d
+            v(-CONSTS[45] - 3*CONSTS[48], CONSTS[46] + 3*CONSTS[49], CONSTS[47] + 3*CONSTS[50]), // 67, offset for third idle chain right crystal d
+            v(CONSTS[51], CONSTS[52], CONSTS[53]), // 68, offset for fourth idle chain left crystal a
+            v(-CONSTS[51], CONSTS[52], CONSTS[53]), // 69, offset for fourth idle chain right crystal a
+            v(CONSTS[51] + CONSTS[54], CONSTS[52] + CONSTS[55], CONSTS[53] + CONSTS[56]), // 70, offset for fourth idle chain left crystal b
+            v(-CONSTS[51] - CONSTS[54], CONSTS[52] + CONSTS[55], CONSTS[53] + CONSTS[56]), // 71, offset for fourth idle chain right crystal b
+            v(CONSTS[51] + 2*CONSTS[54], CONSTS[52] + 2*CONSTS[55], CONSTS[53] + 2*CONSTS[56]), // 72, offset for fourth idle chain left crystal c
+            v(-CONSTS[51] - 2*CONSTS[54], CONSTS[52] + 2*CONSTS[55], CONSTS[53] + 2*CONSTS[56]), // 73, offset for fourth idle chain right crystal c
+            v(CONSTS[51] + 3*CONSTS[54], CONSTS[52] + 3*CONSTS[55], CONSTS[53] + 3*CONSTS[56]), // 74, offset for fourth idle chain left crystal d
+            v(-CONSTS[51] - 3*CONSTS[54], CONSTS[52] + 3*CONSTS[55], CONSTS[53] + 3*CONSTS[56]), // 75, offset for fourth idle chain right crystal d
+            v(CONSTS[57], CONSTS[58], CONSTS[59]), // 76, offset for fifth idle chain left crystal a
+            v(-CONSTS[57], CONSTS[58], CONSTS[59]), // 77, offset for fifth idle chain right crystal a
+            v(CONSTS[57] + CONSTS[60], CONSTS[58] + CONSTS[61], CONSTS[59] + CONSTS[62]), // 78, offset for fifth idle chain left crystal b
+            v(-CONSTS[57] - CONSTS[60], CONSTS[58] + CONSTS[61], CONSTS[59] + CONSTS[62]), // 79, offset for fifth idle chain right crystal b
+            v(CONSTS[57] + 2*CONSTS[60], CONSTS[58] + 2*CONSTS[61], CONSTS[59] + 2*CONSTS[62]), // 80, offset for fifth idle chain left crystal c
+            v(-CONSTS[57] - 2*CONSTS[60], CONSTS[58] + 2*CONSTS[61], CONSTS[59] + 2*CONSTS[62]), // 81, offset for fifth idle chain right crystal c
+            v(CONSTS[57] + 3*CONSTS[60], CONSTS[58] + 3*CONSTS[61], CONSTS[59] + 3*CONSTS[62]), // 82, offset for fifth idle chain left crystal d
+            v(-CONSTS[57] - 3*CONSTS[60], CONSTS[58] + 3*CONSTS[61], CONSTS[59] + 3*CONSTS[62]), // 83, offset for fifth idle chain right crystal d
+            v(CONSTS[63], CONSTS[64], CONSTS[65]), // 84, offset for sixth idle chain left crystal a
+            v(-CONSTS[63], CONSTS[64], CONSTS[65]), // 85, offset for sixth idle chain right crystal a
+            v(CONSTS[63] + CONSTS[66], CONSTS[64] + CONSTS[67], CONSTS[65] + CONSTS[68]), // 86, offset for sixth idle chain left crystal b
+            v(-CONSTS[63] - CONSTS[66], CONSTS[64] + CONSTS[67], CONSTS[65] + CONSTS[68]), // 87, offset for sixth idle chain right crystal b
+            v(CONSTS[63] + 2*CONSTS[66], CONSTS[64] + 2*CONSTS[67], CONSTS[65] + 2*CONSTS[68]), // 88, offset for sixth idle chain left crystal c
+            v(-CONSTS[63] - 2*CONSTS[66], CONSTS[64] + 2*CONSTS[67], CONSTS[65] + 2*CONSTS[68]), // 89, offset for sixth idle chain right crystal c
+            v(CONSTS[63] + 3*CONSTS[66], CONSTS[64] + 3*CONSTS[67], CONSTS[65] + 3*CONSTS[68]), // 90, offset for sixth idle chain left crystal d
+            v(-CONSTS[63] - 3*CONSTS[66], CONSTS[64] + 3*CONSTS[67], CONSTS[65] + 3*CONSTS[68]), // 91, offset for sixth idle chain right crystal d
+            v(CONSTS[69], CONSTS[70], CONSTS[71]), // 92, offset for seventh idle chain left crystal a
+            v(-CONSTS[69], CONSTS[70], CONSTS[71]), // 93, offset for seventh idle chain right crystal a
+            v(CONSTS[69] + CONSTS[72], CONSTS[70] + CONSTS[73], CONSTS[71] + CONSTS[74]), // 94, offset for seventh idle chain left crystal b
+            v(-CONSTS[69] - CONSTS[72], CONSTS[70] + CONSTS[73], CONSTS[71] + CONSTS[74]), // 95, offset for seventh idle chain right crystal b
+            v(CONSTS[69] + 2*CONSTS[72], CONSTS[70] + 2*CONSTS[73], CONSTS[71] + 2*CONSTS[74]), // 96, offset for seventh idle chain left crystal c
+            v(-CONSTS[69] - 2*CONSTS[72], CONSTS[70] + 2*CONSTS[73], CONSTS[71] + 2*CONSTS[74]), // 97, offset for seventh idle chain right crystal c
     };
 
     private static Quaterniondc[] QUATERNIONS = new Quaterniondc[] {
@@ -123,10 +221,25 @@ public class WingsRenderHelper {
             q(1, 0.1, -1, 0.1), // 18, elytra third left crystal rot
             q(1, -0.1, 1, 0.1), // 19, elytra third right crystal rot
 
-            q(0, 0.2, 0, 1), // 20, boost first right crystal rot
-            q(0, -0.2, 0, 1), // 21, boost first left crystal rot
-            q(0, 1, 0, 0.2), // 22, boost second right crystal rot
-            q(0, -1, 0, 0.2), // 23, boost second left crystal rot
+            q(0, 0.2, 0, 1), // 20, boost first left crystal rot
+            q(0, -0.2, 0, 1), // 21, boost first right crystal rot
+            q(0, 1, 0, 0.2), // 22, boost second left crystal rot
+            q(0, -1, 0, 0.2), // 23, boost second right crystal rot
+
+            q(-0.5, 1.2, -0.3, 0.9), // 24, first idle chain left rot
+            q(-0.5, -1.2, 0.3, 0.9), // 25, first idle chain right rot
+            q(-0.7, 1, -0.5, 1.1), // 26, second idle chain left rot
+            q(-0.7, -1, 0.5, 1.1), // 27, second idle chain right rot
+            q(0.5, 0.3, -0.2, 1.1), // 28, third idle chain left rot
+            q(0.5, 0.1, 0.3, 1.2), // 29, third idle chain right rot
+            q(-0.7, -0.9, -1, -0.5), // 30, fourth idle chain left rot
+            q(-0.7, 0.9, 1, -0.5), // 31, fourth idle chain right rot
+            q(-0.7, -0.9, -1, -0.5), // 32, fifth idle chain left rot
+            q(-0.7, 0.9, 1, -0.5), // 33, fifth idle chain right rot
+            q(-0.8, -0.7, -0.4, -1), // 34, sixth idle chain left rot
+            q(-0.8, 0.7, 0.4, -1), // 35, sixth idle chain right rot
+            q(0.05, 0.15, 0.15, 1), // 36, seventh idle chain left rot
+            q(0.05, -0.15, -0.15, 1), // 37, seventh idle chain right rot
     };
 
     public static final EnumMap<WingsAction, CrystalTargetIterable> CRYSTAL_POSITIONS = new EnumMap<>(WingsAction.class) {{
@@ -156,7 +269,63 @@ public class WingsRenderHelper {
                 .with(VEC_3S[21], QUATERNIONS[1])
         );
         this.put(SHIELD_IDLE, new CrystalTargetIterable(SHIELD_IDLE));
-        this.put(IDLE, new CrystalTargetIterable(IDLE) // 28 unique positions 54 total I want to die
+        this.put(IDLE, new CrystalTargetIterable(IDLE).defaultElytraAttached(true)
+                .with(VEC_3S[44], QUATERNIONS[24], 1)
+                .with(VEC_3S[45], QUATERNIONS[25])
+                .with(VEC_3S[46], QUATERNIONS[24], 1)
+                .with(VEC_3S[47], QUATERNIONS[25])
+                .with(VEC_3S[48], QUATERNIONS[24], 1)
+                .with(VEC_3S[49], QUATERNIONS[25])
+                .with(VEC_3S[50], QUATERNIONS[24], 1)
+                .with(VEC_3S[51], QUATERNIONS[25]) // end of first chain set
+                .with(VEC_3S[52], QUATERNIONS[26], 1)
+                .with(VEC_3S[53], QUATERNIONS[27])
+                .with(VEC_3S[54], QUATERNIONS[26], 1)
+                .with(VEC_3S[55], QUATERNIONS[27])
+                .with(VEC_3S[56], QUATERNIONS[26], 1)
+                .with(VEC_3S[57], QUATERNIONS[27])
+                .with(VEC_3S[58], QUATERNIONS[26], 1)
+                .with(VEC_3S[59], QUATERNIONS[27]) // end of second chain set
+                .with(VEC_3S[60], QUATERNIONS[28], 1)
+                .with(VEC_3S[61], QUATERNIONS[29])
+                .with(VEC_3S[62], QUATERNIONS[28], 1)
+                .with(VEC_3S[63], QUATERNIONS[29])
+                .with(VEC_3S[64], QUATERNIONS[28], 1)
+                .with(VEC_3S[65], QUATERNIONS[29])
+                .with(VEC_3S[66], QUATERNIONS[28], 1)
+                .with(VEC_3S[67], QUATERNIONS[29]) // end of third chain set
+                .defaultElytraAttached(false)
+                .with(VEC_3S[68], QUATERNIONS[30])
+                .with(VEC_3S[69], QUATERNIONS[31])
+                .with(VEC_3S[70], QUATERNIONS[30])
+                .with(VEC_3S[71], QUATERNIONS[31])
+                .with(VEC_3S[72], QUATERNIONS[30])
+                .with(VEC_3S[73], QUATERNIONS[31])
+                .with(VEC_3S[74], QUATERNIONS[30])
+                .with(VEC_3S[75], QUATERNIONS[31]) // end of fourth chain set
+                .defaultElytraAttached(true)
+                .with(VEC_3S[76], QUATERNIONS[32])
+                .with(VEC_3S[77], QUATERNIONS[33], 1)
+                .with(VEC_3S[78], QUATERNIONS[32])
+                .with(VEC_3S[79], QUATERNIONS[33], 1)
+                .with(VEC_3S[80], QUATERNIONS[32])
+                .with(VEC_3S[81], QUATERNIONS[33], 1)
+                .with(VEC_3S[82], QUATERNIONS[32])
+                .with(VEC_3S[83], QUATERNIONS[33], 1) // end of fifth chain set
+                .with(VEC_3S[84], QUATERNIONS[34])
+                .with(VEC_3S[85], QUATERNIONS[35], 1)
+                .with(VEC_3S[86], QUATERNIONS[34])
+                .with(VEC_3S[87], QUATERNIONS[35], 1)
+                .with(VEC_3S[88], QUATERNIONS[34])
+                .with(VEC_3S[89], QUATERNIONS[35], 1)
+                .with(VEC_3S[90], QUATERNIONS[34])
+                .with(VEC_3S[91], QUATERNIONS[35], 1) // end of sixth chain set
+                .with(VEC_3S[92], QUATERNIONS[36])
+                .with(VEC_3S[93], QUATERNIONS[37], 1)
+                .with(VEC_3S[94], QUATERNIONS[36])
+                .with(VEC_3S[95], QUATERNIONS[37], 1)
+                .with(VEC_3S[96], QUATERNIONS[36])
+                .with(VEC_3S[97], QUATERNIONS[37], 1) // end of seventh chain set
         );
         this.put(ELYTRA, new CrystalTargetIterable(ELYTRA).defaultElytraAttached(true)
                 .with(VEC_3S[22], QUATERNIONS[2])

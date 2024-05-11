@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
@@ -33,10 +34,13 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyVariable(method = "updateFallFlying", at = @At(value = "JUMP", opcode = Opcodes.IFNE, ordinal = 3))
     private boolean extendedElytraCheck(boolean flag) {
         if (flag) return true;
-        if (this.getSharedFlag(7) && !this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
+        boolean canFly = !this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION);
+        if (this.getSharedFlag(7) && canFly) {
             flag = amethystWings$tryExtendedCheck(EquipmentSlot.MAINHAND);
             if (!flag) flag = amethystWings$tryExtendedCheck(EquipmentSlot.OFFHAND);
         }
+        // failsafe -- when player is fallflying with both elytra and wings, it doesn't stop when it should.
+        if (!canFly && ((Object) this) instanceof Player player) player.stopFallFlying();
         return flag;
     }
 
