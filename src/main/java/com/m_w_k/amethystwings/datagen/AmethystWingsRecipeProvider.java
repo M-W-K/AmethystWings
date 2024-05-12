@@ -44,12 +44,12 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get())
                 .requires(Items.ENDER_PEARL).requires(AmethystWingsItemsRegistry.TREATED_AMETHYST.get())
-                .requires(Items.GLOWSTONE_DUST).requires(Items.REDSTONE)
+                .requires(Items.GUNPOWDER).requires(Items.REDSTONE)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TREATED_AMETHYST.get()))
                 .save(writer);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.AURIC_AMETHYST.get())
                 .requires(Items.ENDER_PEARL).requires(AmethystWingsItemsRegistry.TREATED_AMETHYST.get(), 3)
-                .requires(Items.NETHERITE_INGOT).requires(Items.BLAZE_POWDER)
+                .requires(Items.NETHERITE_INGOT).requires(Items.MAGMA_CREAM)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TREATED_AMETHYST.get()))
                 .save(writer);
     }

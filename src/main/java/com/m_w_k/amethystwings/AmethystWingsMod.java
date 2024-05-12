@@ -36,7 +36,7 @@ public class AmethystWingsMod {
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::onModelRegistration);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AmethystWingsConfig.SPEC);
     }
 
     public void gatherData(GatherDataEvent event) {

@@ -2,7 +2,7 @@ package com.m_w_k.amethystwings.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.m_w_k.amethystwings.Config;
+import com.m_w_k.amethystwings.AmethystWingsConfig;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
@@ -188,12 +188,12 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     public void takeBoostDamage(@NotNull LivingEntity owningEntity) {
-        if (Config.altBoostDamage) {
-            weightedDamage(owningEntity, crystalsBoostSortedActive.fullList, Config.boostDamage, false);
+        if (AmethystWingsConfig.altBoostDamage) {
+            weightedDamage(owningEntity, crystalsBoostSortedActive.fullList, AmethystWingsConfig.boostDamage, false);
         } else {
             Iterator<Crystal> boostCrystals = crystalsBoostSortedActive.fullList.iterator();
             if (!boostCrystals.hasNext()) return;
-            boostCrystals.next().damage(owningEntity, applyDamageReduction(owningEntity, Config.boostDamage, false));
+            boostCrystals.next().damage(owningEntity, applyDamageReduction(owningEntity, AmethystWingsConfig.boostDamage, false));
         }
         handleShatteredCrystals(owningEntity);
     }
@@ -202,7 +202,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         // 1 point of incoming damage = 3 durability damage
         int damage = applyDamageReduction(owningEntity, incomingDamage * 3, true);
         Iterator<Crystal> shieldCrystals = crystalsShieldSorted.fullList.iterator();
-        int guaranteedShatter = shatter ? Config.shieldBreakMassDamage : 0;
+        int guaranteedShatter = shatter ? AmethystWingsConfig.shieldBreakMassDamage : 0;
         while (shieldCrystals.hasNext() && damage > 0) {
             Crystal crystal = shieldCrystals.next();
             if (guaranteedShatter > 0) {

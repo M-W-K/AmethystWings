@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class Config
+public class AmethystWingsConfig
 {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
@@ -23,7 +23,7 @@ public class Config
             .define("shieldBreakCooldown", false);
 
     private static final ForgeConfigSpec.IntValue SHIELD_BREAK_MASS_DAMAGE = BUILDER
-            .comment("Mass damage dealt by shield-breaking hits. Mass damage to crystals occurs before normal damage.")
+            .comment("Mass damage dealt by shield-breaking hits. Mass damage to crystals occurs before normal damage, and cannot be reduced.")
             .defineInRange("shieldBreakMassDamage", 10, 0, 100);
 
     private static final ForgeConfigSpec.IntValue RESONANT_MASS = BUILDER

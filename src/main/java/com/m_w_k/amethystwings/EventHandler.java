@@ -40,7 +40,7 @@ public final class EventHandler {
             }
             cap.takeBlockDamage(defender,
                     event.getBlockedDamage(), shatter, knockback);
-            if (shatter && !Config.shieldBreakCooldown) COOLDOWNED_WINGS.add(() -> ((Player) defender).getCooldowns().removeCooldown(item));
+            if (shatter && !AmethystWingsConfig.shieldBreakCooldown) COOLDOWNED_WINGS.add(() -> ((Player) defender).getCooldowns().removeCooldown(item));
         }
     }
 
