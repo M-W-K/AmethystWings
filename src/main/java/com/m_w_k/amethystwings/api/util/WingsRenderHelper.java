@@ -90,6 +90,28 @@ public class WingsRenderHelper {
             3/16d, // 72, x offset between seventh idle chain crystals
             1/16d, // 73, y offset between seventh idle chain crystals
             5/16d, // 74, z offset between seventh idle chain crystals
+
+            9.5/16d, // 75, x offset for first shield idle
+            -3/16d, // 76, y offset for first shield idle
+            0/16d, // 77, z offset for first shield idle
+            11.5/16d, // 78, first shield idle chain origin x offset
+            -0.3/16d, // 79, first shield idle chain origin y offset
+            -1.3/16d, // 80, first shield idle chain origin z offset
+            0.3/16d, // 81, x offset between first shield idle chain crystals
+            5.3/16d, // 82, y offset between first shield idle chain crystals
+            -0.3/16d, // 83, z offset between first shield idle chain crystals
+            11/16d, // 84, second shield idle chain origin x offset
+            -0.5/16d, // 85, second shield idle chain origin y offset
+            2.5/16d, // 86, second shield idle chain origin z offset
+            0.3/16d, // 87, x offset between second shield idle chain crystals
+            5.3/16d, // 88, y offset between second shield idle chain crystals
+            -0.4/16d, // 89, z offset between second shield idle chain crystals
+            10.5/16d, // 90, third shield idle chain origin x offset
+            -0.1/16d, // 91, third shield idle chain origin y offset
+            -5/16d, // 92, third shield idle chain origin z offset
+            0.3/16d, // 93, x offset between third shield idle chain crystals
+            5.3/16d, // 94, y offset between third shield idle chain crystals
+            -0.2/16d, // 95, z offset between third shield idle chain crystals
     };
 
     private static Vec3[] VEC_3S = new Vec3[] {
@@ -195,6 +217,27 @@ public class WingsRenderHelper {
             v(-CONSTS[69] - CONSTS[72], CONSTS[70] + CONSTS[73], CONSTS[71] + CONSTS[74]), // 95, offset for seventh idle chain right crystal b
             v(CONSTS[69] + 2*CONSTS[72], CONSTS[70] + 2*CONSTS[73], CONSTS[71] + 2*CONSTS[74]), // 96, offset for seventh idle chain left crystal c
             v(-CONSTS[69] - 2*CONSTS[72], CONSTS[70] + 2*CONSTS[73], CONSTS[71] + 2*CONSTS[74]), // 97, offset for seventh idle chain right crystal c
+
+            v(CONSTS[75], CONSTS[76], CONSTS[77]), // 98, first shield idle crystal left
+            v(-CONSTS[75], CONSTS[76], CONSTS[77]), // 99, first shield idle crystal right
+            v(CONSTS[78], CONSTS[79], CONSTS[80]), // 100, first shield idle chain left a
+            v(-CONSTS[78], CONSTS[79], CONSTS[80]), // 101, first shield idle chain right a
+            v(CONSTS[78] + CONSTS[81], CONSTS[79] + CONSTS[82], CONSTS[80] + CONSTS[83]), // 102, first shield idle chain left b
+            v(-CONSTS[78] - CONSTS[81], CONSTS[79] + CONSTS[82], CONSTS[80] + CONSTS[83]), // 103, first shield idle chain right b
+            v(CONSTS[78] + 2*CONSTS[81], CONSTS[79] + 2*CONSTS[82], CONSTS[80] + 2*CONSTS[83]), // 104, first shield idle chain left b
+            v(-CONSTS[78] - 2*CONSTS[81], CONSTS[79] + 2*CONSTS[82], CONSTS[80] + 2*CONSTS[83]), // 105, first shield idle chain right b
+            v(CONSTS[84], CONSTS[85], CONSTS[86]), // 106, second shield idle chain left a
+            v(-CONSTS[84], CONSTS[85], CONSTS[86]), // 107, second shield idle chain right a
+            v(CONSTS[84] + CONSTS[87], CONSTS[85] + CONSTS[88], CONSTS[86] + CONSTS[89]), // 108, second shield idle chain left b
+            v(-CONSTS[84] - CONSTS[87], CONSTS[85] + CONSTS[88], CONSTS[86] + CONSTS[89]), // 109, second shield idle chain right b
+            v(CONSTS[84] + 2*CONSTS[87], CONSTS[85] + 2*CONSTS[88], CONSTS[86] + 2*CONSTS[89]), // 110, second shield idle chain left b
+            v(-CONSTS[84] - 2*CONSTS[87], CONSTS[85] + 2*CONSTS[88], CONSTS[86] + 2*CONSTS[89]), // 111, second shield idle chain right b
+            v(CONSTS[90], CONSTS[91], CONSTS[92]), // 112, third shield idle chain left a
+            v(-CONSTS[90], CONSTS[91], CONSTS[92]), // 113, third shield idle chain right a
+            v(CONSTS[90] + CONSTS[93], CONSTS[91] + CONSTS[94], CONSTS[92] + CONSTS[95]), // 114, third shield idle chain left b
+            v(-CONSTS[90] - CONSTS[93], CONSTS[91] + CONSTS[94], CONSTS[92] + CONSTS[95]), // 115, third shield idle chain right b
+            v(CONSTS[90] + 2*CONSTS[93], CONSTS[91] + 2*CONSTS[94], CONSTS[92] + 2*CONSTS[95]), // 116, third shield idle chain left b
+            v(-CONSTS[90] - 2*CONSTS[93], CONSTS[91] + 2*CONSTS[94], CONSTS[92] + 2*CONSTS[95]), // 117, third shield idle chain right b
     };
 
     private static Quaterniondc[] QUATERNIONS = new Quaterniondc[] {
@@ -240,6 +283,15 @@ public class WingsRenderHelper {
             q(-0.8, 0.7, 0.4, -1), // 35, sixth idle chain right rot
             q(0.05, 0.15, 0.15, 1), // 36, seventh idle chain left rot
             q(0.05, -0.15, -0.15, 1), // 37, seventh idle chain right rot
+
+            q(-1, -1, 1, 1.1), // 38, first shield idle left rot
+            q(1, -1, 1, -1.1), // 39, first shield idle right rot
+            q(0, 2, 0, -0.1), // 40, first shield idle chain left rot
+            q(0, 2, 0, 0.1), // 41, first shield idle chain right rot
+            q(0, 1, 0, 0.2), // 42, second shield idle chain left rot
+            q(0, 1, 0, -0.2), // 43, second shield idle chain right rot
+            q(0, 1, 0, -0.3), // 44, third shield idle chain left rot
+            q(0, 1, 0, 0.3), // 45, third shield idle chain right rot
     };
 
     public static final EnumMap<WingsAction, CrystalTargetIterable> CRYSTAL_POSITIONS = new EnumMap<>(WingsAction.class) {{
@@ -268,7 +320,28 @@ public class WingsRenderHelper {
                 .with(VEC_3S[20], QUATERNIONS[1])
                 .with(VEC_3S[21], QUATERNIONS[1])
         );
-        this.put(SHIELD_IDLE, new CrystalTargetIterable(SHIELD_IDLE));
+        this.put(SHIELD_IDLE, new CrystalTargetIterable(SHIELD_IDLE)
+                .with(VEC_3S[98], QUATERNIONS[38])
+                .with(VEC_3S[99], QUATERNIONS[39])
+                .with(VEC_3S[100], QUATERNIONS[40])
+                .with(VEC_3S[101], QUATERNIONS[41])
+                .with(VEC_3S[102], QUATERNIONS[40])
+                .with(VEC_3S[103], QUATERNIONS[41])
+                .with(VEC_3S[104], QUATERNIONS[40])
+                .with(VEC_3S[105], QUATERNIONS[41]) // end of first chain
+                .with(VEC_3S[106], QUATERNIONS[42])
+                .with(VEC_3S[107], QUATERNIONS[43])
+                .with(VEC_3S[108], QUATERNIONS[42])
+                .with(VEC_3S[109], QUATERNIONS[43])
+                .with(VEC_3S[110], QUATERNIONS[42])
+                .with(VEC_3S[111], QUATERNIONS[43]) // end of second chain
+                .with(VEC_3S[112], QUATERNIONS[44])
+                .with(VEC_3S[113], QUATERNIONS[45])
+                .with(VEC_3S[114], QUATERNIONS[44])
+                .with(VEC_3S[115], QUATERNIONS[45])
+                .with(VEC_3S[116], QUATERNIONS[44])
+                .with(VEC_3S[117], QUATERNIONS[45]) // end of third chain
+        );
         this.put(IDLE, new CrystalTargetIterable(IDLE).defaultElytraAttached(true)
                 .with(VEC_3S[44], QUATERNIONS[24], 1)
                 .with(VEC_3S[45], QUATERNIONS[25])
