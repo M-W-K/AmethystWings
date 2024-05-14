@@ -9,14 +9,7 @@ import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.network.CrystalParticlePacket;
 import com.m_w_k.amethystwings.network.WingsBoostPacket;
 import com.m_w_k.amethystwings.registry.AmethystWingsSoundsRegistry;
-import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +20,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
@@ -56,7 +48,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private final Integer dataKey;
     private final WingsCapDataCache.WingsCapData data;
-    private final ItemStack stack;
+    public final ItemStack stack;
     private final LazyOptional<WingsCapability> holder = LazyOptional.of(() -> this);
 
     private CompoundTag cachedTag;
@@ -72,9 +64,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private final Vector3d drift = new Vector3d();
     private boolean crouching;
     private boolean crystalRenderCacheInvalid = true;
-    private final static PoseStack ELYTRA_HELPER = new PoseStack();
-    private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
-    private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
     private static Matrix4f RIGHT_WING_MATRIX;
     private static Matrix4f LEFT_WING_MATRIX;
 
@@ -300,6 +289,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         double delta = partialTicks - this.partialTicks + (this.tickPassed ? 1 : 0);
         this.partialTicks = partialTicks;
         this.crouching = entity.hasPose(Pose.CROUCHING);
+        // server doesn't pass along a 'stopped using' packet properly
+        if (!entity.isUsingItem() && isBlocking) {
+            this.setBlocking(false);
+        }
         Vec3 entityLocation = entity.getPosition(partialTicks);
         this.drift.set(
                 -log((entityLocation.x() - lastEntityLocation.x()) / delta) / 8,
@@ -308,7 +301,11 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         );
         this.lastEntityLocation = entityLocation;
         if (this.crystalRenderCacheInvalid) rebuildCrystalRenderCache();
-        setupAnim(entity);
+    }
+
+    public void setElytraRenderMatrices(Matrix4f left, Matrix4f right) {
+        LEFT_WING_MATRIX = left;
+        RIGHT_WING_MATRIX = right;
     }
 
     private static double log(double num) {
@@ -359,60 +356,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         }
 
         crystalRenderCacheInvalid = false;
-    }
-
-    /**
-     * Ripped directly from {@link net.minecraft.client.model.ElytraModel}
-     */
-    private void setupAnim(LivingEntity entity) {
-        float f = 0.2617994F;
-        float f1 = -0.2617994F;
-        float f2 = 0.0F;
-        float f3 = 0.0F;
-        if (entity.isFallFlying()) {
-            float f4 = 1.0F;
-            Vec3 vec3 = entity.getDeltaMovement();
-            if (vec3.y < 0.0D) {
-                Vec3 vec31 = vec3.normalize();
-                f4 = 1.0F - (float)Math.pow(-vec31.y, 1.5D);
-            }
-
-            f = f4 * 0.34906584F + (1.0F - f4) * f;
-            f1 = f4 * (-(float)Math.PI / 2F) + (1.0F - f4) * f1;
-        } else if (entity.isCrouching()) {
-            f = 0.6981317F;
-            f1 = (-(float)Math.PI / 4F);
-            f2 = 3.0F;
-            f3 = 0.08726646F;
-        }
-
-        LEFT_FAKE_WING.y = f2;
-        if (entity instanceof AbstractClientPlayer abstractclientplayer) {
-            abstractclientplayer.elytraRotX += (f - abstractclientplayer.elytraRotX) * 0.1F;
-            abstractclientplayer.elytraRotY += (f3 - abstractclientplayer.elytraRotY) * 0.1F;
-            abstractclientplayer.elytraRotZ += (f1 - abstractclientplayer.elytraRotZ) * 0.1F;
-            LEFT_FAKE_WING.xRot = abstractclientplayer.elytraRotX;
-            LEFT_FAKE_WING.yRot = abstractclientplayer.elytraRotY;
-            LEFT_FAKE_WING.zRot = abstractclientplayer.elytraRotZ;
-        } else {
-            LEFT_FAKE_WING.xRot = f;
-            LEFT_FAKE_WING.zRot = f1;
-            LEFT_FAKE_WING.yRot = f3;
-        }
-
-        RIGHT_FAKE_WING.yRot = -LEFT_FAKE_WING.yRot;
-        RIGHT_FAKE_WING.y = LEFT_FAKE_WING.y;
-        RIGHT_FAKE_WING.xRot = LEFT_FAKE_WING.xRot;
-        RIGHT_FAKE_WING.zRot = -LEFT_FAKE_WING.zRot;
-
-        ELYTRA_HELPER.pushPose();
-        RIGHT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
-        RIGHT_WING_MATRIX = ELYTRA_HELPER.last().pose();
-        ELYTRA_HELPER.popPose();
-        ELYTRA_HELPER.pushPose();
-        LEFT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
-        LEFT_WING_MATRIX = ELYTRA_HELPER.last().pose();
-        ELYTRA_HELPER.popPose();
     }
 
     @Override
@@ -748,15 +691,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         private Quaterniond lerpRotation(@NotNull Quaterniond target) {
             if (tickPassed) data().lastRotation.set(target);
             return data().lastRotation.nlerp(target, partialTicks, target);
-        }
-
-        public void render(@NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-            poseStack.pushPose();
-            poseStack.translate(0.5, 0.5, 0.5);
-            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(crystalItem.getWingsModelLoc());
-            renderer.render(stack, ItemDisplayContext.NONE, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
-            poseStack.popPose();
         }
 
         public int getDamage() {

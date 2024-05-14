@@ -55,7 +55,7 @@ public final class WingsCapDataCache {
      * Data storage primarily so that client data is not lost on cap reinit on server sync packet.
      */
     public static final class WingsCapData {
-        private static final NonNullList<CrystalData> crystals = NonNullList.withSize(54, CrystalData.EMPTY);
+        private final NonNullList<CrystalData> crystals = NonNullList.withSize(54, CrystalData.EMPTY);
 
         public long lastBoostTick;
 

@@ -47,7 +47,6 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        WingsItem item = (WingsItem) stack.getItem();
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide()) {
                 WingsContainer.openGUI((ServerPlayer) player, hand);

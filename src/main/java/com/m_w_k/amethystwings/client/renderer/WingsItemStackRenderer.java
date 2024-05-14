@@ -5,6 +5,8 @@ import com.m_w_k.amethystwings.client.model.WingsModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -32,6 +34,10 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final WingsModel WINGS_MODEL = new WingsModel(WingsModel.createLayer().bakeRoot());
     public static final ModelResourceLocation WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "wings_controller_inventory", "inventory");
     public static final ResourceLocation WINGS_TEXTURE = new ResourceLocation(MODID, "textures/entity/wings_controller.png");
+
+    private final static PoseStack ELYTRA_HELPER = new PoseStack();
+    private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
+    private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
 
     public WingsItemStackRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
@@ -62,6 +68,7 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static void crystalRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, LivingEntity entity, int combinedLightIn, int combinedOverlayIn) {
         float partialTicks = Minecraft.getInstance().getPartialTick();
         cap.prepareForRender(partialTicks, entity);
+        setupAnim(cap, entity);
         PoseStack.Pose poseTop = poseStack.last();
         poseStack.popPose();
         PoseStack.Pose poseLER = poseStack.last();
@@ -82,7 +89,7 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
             Quaterniond rot = crystal.calculateRotation(matrixLER); // TODO fix rot lerping
             poseStack.mulPose(rot.get(new Quaternionf()));
 
-            crystal.render(poseStack, buffer, combinedLightIn, combinedOverlayIn);
+            renderCrystal(cap, crystal, poseStack, buffer, combinedLightIn, combinedOverlayIn);
 
             poseStack.popPose();
             poseStack.popPose();
@@ -90,6 +97,69 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
         }
         // restore the top pose
         poseStack.pushTransformation(transformationLER);
+    }
+
+    private static void renderCrystal(WingsCapability cap, @NotNull WingsCapability.Crystal crystal, @NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+        poseStack.pushPose();
+        poseStack.translate(0.5, 0.5, 0.5);
+        ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(crystal.crystalItem.getWingsModelLoc());
+        renderer.render(cap.stack, ItemDisplayContext.NONE, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
+        poseStack.popPose();
+    }
+
+    /**
+     * Ripped directly from {@link net.minecraft.client.model.ElytraModel}
+     */
+    private static void setupAnim(WingsCapability cap, LivingEntity entity) {
+        float f = 0.2617994F;
+        float f1 = -0.2617994F;
+        float f2 = 0.0F;
+        float f3 = 0.0F;
+        if (entity.isFallFlying()) {
+            float f4 = 1.0F;
+            Vec3 vec3 = entity.getDeltaMovement();
+            if (vec3.y < 0.0D) {
+                Vec3 vec31 = vec3.normalize();
+                f4 = 1.0F - (float)Math.pow(-vec31.y, 1.5D);
+            }
+
+            f = f4 * 0.34906584F + (1.0F - f4) * f;
+            f1 = f4 * (-(float)Math.PI / 2F) + (1.0F - f4) * f1;
+        } else if (entity.isCrouching()) {
+            f = 0.6981317F;
+            f1 = (-(float)Math.PI / 4F);
+            f2 = 3.0F;
+            f3 = 0.08726646F;
+        }
+
+        LEFT_FAKE_WING.y = f2;
+        if (entity instanceof AbstractClientPlayer abstractclientplayer) {
+            abstractclientplayer.elytraRotX += (f - abstractclientplayer.elytraRotX) * 0.1F;
+            abstractclientplayer.elytraRotY += (f3 - abstractclientplayer.elytraRotY) * 0.1F;
+            abstractclientplayer.elytraRotZ += (f1 - abstractclientplayer.elytraRotZ) * 0.1F;
+            LEFT_FAKE_WING.xRot = abstractclientplayer.elytraRotX;
+            LEFT_FAKE_WING.yRot = abstractclientplayer.elytraRotY;
+            LEFT_FAKE_WING.zRot = abstractclientplayer.elytraRotZ;
+        } else {
+            LEFT_FAKE_WING.xRot = f;
+            LEFT_FAKE_WING.zRot = f1;
+            LEFT_FAKE_WING.yRot = f3;
+        }
+
+        RIGHT_FAKE_WING.yRot = -LEFT_FAKE_WING.yRot;
+        RIGHT_FAKE_WING.y = LEFT_FAKE_WING.y;
+        RIGHT_FAKE_WING.xRot = LEFT_FAKE_WING.xRot;
+        RIGHT_FAKE_WING.zRot = -LEFT_FAKE_WING.zRot;
+
+        ELYTRA_HELPER.pushPose();
+        RIGHT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
+        Matrix4f temp = ELYTRA_HELPER.last().pose();
+        ELYTRA_HELPER.popPose();
+        ELYTRA_HELPER.pushPose();
+        LEFT_FAKE_WING.translateAndRotate(ELYTRA_HELPER);
+        cap.setElytraRenderMatrices(ELYTRA_HELPER.last().pose(), temp);
+        ELYTRA_HELPER.popPose();
     }
 
     public static ResourceLocation getWingsInventoryModel() {
