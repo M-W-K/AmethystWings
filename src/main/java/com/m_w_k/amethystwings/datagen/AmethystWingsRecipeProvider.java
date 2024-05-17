@@ -34,7 +34,7 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.HARDENED_AMETHYST.get())
                 .requires(Items.ENDER_PEARL).requires(AmethystWingsItemsRegistry.TREATED_AMETHYST.get())
-                .requires(Items.IRON_INGOT)
+                .requires(Items.IRON_INGOT).requires(Items.GOLD_INGOT)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TREATED_AMETHYST.get()))
                 .save(writer);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.SHAPED_AMETHYST.get())
