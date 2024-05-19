@@ -58,10 +58,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private boolean crystalDamaged;
 
-    private float partialTicks;
-    private boolean tickPassed;
-    private Vec3 lastEntityLocation = new Vec3(0, 0, 0);
-    private final Vector3d drift = new Vector3d();
     private boolean crouching;
     private boolean crystalRenderCacheInvalid = true;
     private static Matrix4f RIGHT_WING_MATRIX;
@@ -140,7 +136,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         }
     }
 
-    private static void truncateList(List<?> list, int maxSize) {
+    private static void truncateList(@NotNull List<?> list, int maxSize) {
         if (list.size() > maxSize) {
             list.subList(maxSize, list.size()).clear();
         }
@@ -285,21 +281,21 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     public void prepareForRender(float partialTicks, LivingEntity entity) {
         handleParticles(entity);
-        this.tickPassed = this.partialTicks > partialTicks;
-        double delta = partialTicks - this.partialTicks + (this.tickPassed ? 1 : 0);
-        this.partialTicks = partialTicks;
+        data.tickPassed = data.partialTicks > partialTicks;
+        double delta = partialTicks - data.partialTicks + (data.tickPassed ? 1 : 0);
+        data.partialTicks = partialTicks;
         this.crouching = entity.hasPose(Pose.CROUCHING);
         // server doesn't pass along a 'stopped using' packet properly
         if (!entity.isUsingItem() && isBlocking) {
             this.setBlocking(false);
         }
         Vec3 entityLocation = entity.getPosition(partialTicks);
-        this.drift.set(
-                -log((entityLocation.x() - lastEntityLocation.x()) / delta) / 8,
-                -log((entityLocation.y() - lastEntityLocation.y()) / delta) / 8,
-                -log((entityLocation.z() - lastEntityLocation.z()) / delta) / 8
+        data.drift.set(
+                -log((entityLocation.x() - data.lastEntityLocation.x()) / delta) / 8,
+                -log((entityLocation.y() - data.lastEntityLocation.y()) / delta) / 8,
+                -log((entityLocation.z() - data.lastEntityLocation.z()) / delta) / 8
         );
-        this.lastEntityLocation = entityLocation;
+        data.lastEntityLocation = entityLocation;
         if (this.crystalRenderCacheInvalid) rebuildCrystalRenderCache();
     }
 
@@ -311,8 +307,9 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private static double log(double num) {
         return Math.log1p(Math.abs(num)) * Math.signum(num);
     }
+
     private void handleParticles(@NotNull LivingEntity entity) {
-        data.forNonEmpty((crystalData -> crystalData.handleParticles(entity, this.partialTicks, this.drift)));
+        data.forNonEmpty((crystalData -> crystalData.handleParticles(entity, data.partialTicks, data.drift)));
     }
 
     private void rebuildCrystalRenderCache() {
@@ -510,7 +507,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return itemStacksCache;
     }
 
-    private NonNullList<ItemStack> refreshItemList(CompoundTag rootTag)
+    private @NotNull NonNullList<ItemStack> refreshItemList(CompoundTag rootTag)
     {
         NonNullList<ItemStack> itemStacks = NonNullList.withSize(getSlots(), ItemStack.EMPTY);
         if (rootTag != null && rootTag.contains("Items", CompoundTag.TAG_LIST))
@@ -666,7 +663,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             return new Vec3(this.lerpPosition(target).sub(correction));
         }
 
-        public Quaterniond calculateRotation(Matrix4f rot) {
+        public Quaterniond calculateRotation(@NotNull Matrix4f rot) {
             Quaterniondc target = getTarget().targetRotation();
             // why can I not transform quaternions by a matrix directly smh
             Matrix4f targetAbsolute = target.get(HELPER).mul(rot.invert(HELPER2));
@@ -680,17 +677,17 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         @Contract("_ -> new")
         private @NotNull Vector3f lerpPosition(Vector3f target) {
-            if (tickPassed) {
+            if (data.tickPassed) {
                 data().lastPosition.set(data().targetPosition);
                 data().targetPosition.set(target);
             }
-            return data().lerpPosition(partialTicks, drift);
+            return data().lerpPosition(data.partialTicks, data.drift);
 
         }
 
         private Quaterniond lerpRotation(@NotNull Quaterniond target) {
-            if (tickPassed) data().lastRotation.set(target);
-            return data().lastRotation.nlerp(target, partialTicks, target);
+            if (data.tickPassed) data().lastRotation.set(target);
+            return data().lastRotation.nlerp(target, data.partialTicks, target);
         }
 
         public int getDamage() {
