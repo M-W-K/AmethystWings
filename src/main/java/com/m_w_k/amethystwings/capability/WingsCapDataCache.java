@@ -8,9 +8,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +17,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.WeakHashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class WingsCapDataCache {
@@ -35,12 +32,12 @@ public final class WingsCapDataCache {
             if (stack.getOrCreateTag().contains("CapID")) {
                 return handleStackWithID(stack);
             } else {
-                stack.getOrCreateTag().putInt("CapID", getID());
+                stack.getOrCreateTag().putInt("CapID", getUniqueID());
                 return handleStackWithID(stack);
             }
         } else {
             // physical server handling -- always generate a unique CapID, but don't bother with data.
-            stack.getOrCreateTag().putInt("CapID", getID());
+            stack.getOrCreateTag().putInt("CapID", getUniqueID());
             return new WingsCapability(stack, 0, FALLBACK);
         }
     }
@@ -59,13 +56,13 @@ public final class WingsCapDataCache {
         }
     }
 
-    private static int getID() {
-        if (id == Integer.MAX_VALUE) {
-            // wrap around instead of integer overflow
-            id = Integer.MIN_VALUE;
-            return id;
+    private static int getUniqueID() {
+        // clients select a randomized negative integer, physical servers can do simple ++
+        if (FMLEnvironment.dist.isClient()) {
+            return (int) (Math.random() * Integer.MIN_VALUE);
+        } else {
+            return id++;
         }
-        else return id++;
     }
 
     @Nullable
