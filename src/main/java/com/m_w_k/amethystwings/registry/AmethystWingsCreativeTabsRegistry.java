@@ -16,7 +16,7 @@ public class AmethystWingsCreativeTabsRegistry {
     public static final RegistryObject<CreativeModeTab> WINGS_TAB = CREATIVE_MODE_TABS.register("amethystwings_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.amethystwings"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> AmethystWingsItemsRegistry.WINGS.get().getDefaultInstance())
+            .icon(() -> AmethystWingsItemsRegistry.TREATED_AMETHYST.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(AmethystWingsItemsRegistry.WINGS.get());
                 output.accept(AmethystWingsItemsRegistry.TREATED_AMETHYST.get());
