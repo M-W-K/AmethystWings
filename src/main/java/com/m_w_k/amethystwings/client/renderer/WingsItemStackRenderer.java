@@ -1,7 +1,10 @@
 package com.m_w_k.amethystwings.client.renderer;
 
+import com.m_w_k.amethystwings.api.util.WingsAction;
+import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.model.WingsModel;
+import com.m_w_k.amethystwings.item.WingsItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
@@ -25,6 +28,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaterniond;
 import org.joml.Quaternionf;
 
+import java.util.Iterator;
+
 import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 
 @OnlyIn(Dist.CLIENT)
@@ -37,29 +42,51 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
     private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
 
+    private final static Quaternionf CORRECTION = new Quaternionf(0, 0, 1, 0);
+
     public WingsItemStackRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
 
     @Override
     public void renderByItem(@NotNull ItemStack stack, @NotNull ItemDisplayContext context, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-        poseStack.popPose(); // remove the -0.5, -0.5, -0.5 shift
-        poseStack.pushPose();
         if (context == ItemDisplayContext.GROUND || context == ItemDisplayContext.GUI || context == ItemDisplayContext.FIXED) {
+            poseStack.popPose(); // remove the -0.5, -0.5, -0.5 shift
+            poseStack.pushPose();
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
             BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(WINGS_INVENTORY_MODEL);
             renderer.render(stack, context, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
-            return;
+        } else {
+            boolean mirrored = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
+            WINGS_MODEL.render(poseStack, buffer.getBuffer(RenderType.entitySolid(WINGS_TEXTURE)), combinedLightIn, combinedOverlayIn, mirrored);
+            if (context.firstPerson() && stack.getItem() instanceof WingsItem item) {
+                crystalFirstPersonRender(item.getCapability(stack), poseStack, buffer, combinedLightIn, combinedOverlayIn, context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND);
+            }
         }
-        handRender(context, poseStack, buffer, combinedLightIn, combinedOverlayIn);
     }
 
-    private static void handRender(@NotNull ItemDisplayContext context, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-        poseStack.pushPose();
-        poseStack.translate(-0.5, -0.5, -0.5);
-        boolean mirrored = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
-        WINGS_MODEL.render(poseStack, buffer.getBuffer(RenderType.entitySolid(WINGS_TEXTURE)), combinedLightIn, combinedOverlayIn, mirrored);
+    private static void crystalFirstPersonRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn, boolean mirrored) {
+        if (!cap.isBlocking()) return;
         poseStack.popPose();
+        poseStack.pushPose();
+        poseStack.translate(mirrored ? 0.6 : -0.52, 0.2, 0.55);
+        poseStack.mulPose(CORRECTION);
+        Iterator<WingsRenderHelper.CrystalTarget>  iter = WingsRenderHelper.CRYSTAL_POSITIONS.get(WingsAction.SHIELD);
+        for (WingsCapability.Crystal crystal : cap.getCrystalsShieldSorted().fullList) {
+            if (!iter.hasNext()) return;
+            WingsRenderHelper.CrystalTarget target = iter.next();
+            poseStack.pushPose();
+
+            Vec3 offset = target.targetPosition();
+            poseStack.translate(offset.x(), offset.y(), offset.z());
+            poseStack.pushPose();
+
+            poseStack.mulPose(target.targetRotation().get(new Quaternionf()));
+            renderCrystal(cap, crystal, poseStack, buffer, combinedLightIn, combinedOverlayIn);
+
+            poseStack.popPose();
+            poseStack.popPose();
+        }
     }
 
     // called externally

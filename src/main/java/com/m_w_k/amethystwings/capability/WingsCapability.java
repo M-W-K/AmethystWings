@@ -108,6 +108,14 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         }
     }
 
+    public SortedCrystalList getCrystalsShieldSorted() {
+        return crystalsShieldSorted;
+    }
+
+    public boolean isBlocking() {
+        return isBlocking;
+    }
+
     private void initActiveLists() {
         invalidateCrystalRenderCache();
         crystalsBoostSortedActive.clear();
@@ -738,7 +746,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
 
-    protected class SortedCrystalList {
+    public class SortedCrystalList {
         public List<Crystal> fullList = new ObjectArrayList<>();
         public List<Crystal> singleAction = new ObjectArrayList<>();
         public List<Crystal> manyAction = new ObjectArrayList<>();

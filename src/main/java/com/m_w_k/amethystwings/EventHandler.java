@@ -30,12 +30,12 @@ public final class EventHandler {
         if (stack.getItem() instanceof WingsItem item) {
             WingsCapability cap = item.getCapability(stack);
             boolean shatter = false;
-            Runnable knockback = () -> doKnockback(defender, new Vec3(-defender.getLookAngle().x(), 0, -defender.getLookAngle().y()));
+            Runnable knockback = () -> doKnockback(defender, new Vec3(-defender.getLookAngle().x(), 8, -defender.getLookAngle().y()));
             if (!event.getDamageSource().is(DamageTypeTags.IS_PROJECTILE)) {
                 Entity entity = event.getDamageSource().getDirectEntity();
                 if (entity instanceof LivingEntity attacker) {
                     shatter = attacker.getMainHandItem().canDisableShield(defender.getUseItem(), defender, attacker);
-                    knockback = () -> doKnockback(defender, new Vec3(defender.getX() - attacker.getX(), 0, defender.getZ() - attacker.getZ()));
+                    knockback = () -> doKnockback(defender, new Vec3(attacker.getX() - defender.getX(), 8, attacker.getZ() - defender.getZ()));
                 }
             }
             cap.takeBlockDamage(defender,
@@ -45,8 +45,8 @@ public final class EventHandler {
     }
 
     private static void doKnockback(LivingEntity entity, Vec3 vec) {
-        vec = vec.normalize().add(0, 1, 0).scale(5);
-        entity.addDeltaMovement(vec); //TODO not working, not called clientside?
+        entity.knockback(vec.y(), vec.x(), vec.z());
+        entity.hurtMarked = true;
     }
 
     @SubscribeEvent
