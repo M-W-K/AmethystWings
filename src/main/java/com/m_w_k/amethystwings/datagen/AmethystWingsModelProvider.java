@@ -26,15 +26,11 @@ public class AmethystWingsModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        crystalModel(RESONANT);
-        crystalModel(HARDENED);
-        crystalModel(ENERGETIC);
-        crystalModel(SHAPED);
-        crystalModel(AURIC);
-    }
-
-    protected void crystalModel(ResourceLocation loc) {
-        crystalModel(loc, loc);
+        crystalModel(RESONANT, rl("block/resonant_crystal"));
+        crystalModel(HARDENED, rl("block/hardened_crystal"));
+        crystalModel(ENERGETIC, rl("block/energetic_crystal"));
+        crystalModel(SHAPED, rl("block/shaped_crystal"));
+        crystalModel(AURIC, rl("block/auric_crystal"));
     }
 
     protected void crystalModel(ResourceLocation destLoc, ResourceLocation texLoc) {

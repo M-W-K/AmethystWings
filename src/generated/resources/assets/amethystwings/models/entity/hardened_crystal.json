@@ -1,6 +1,6 @@
 {
   "parent": "amethystwings:entity/crystal",
   "textures": {
-    "layer0": "amethystwings:entity/hardened_crystal"
+    "layer0": "amethystwings:block/hardened_crystal"
   }
 }

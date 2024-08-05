@@ -8,9 +8,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -22,19 +24,28 @@ public abstract class PlayerMixin extends LivingEntity {
         super(p_20966_, p_20967_);
     }
 
-    @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot p_36257_);
+    @Shadow public abstract @NotNull ItemStack getItemBySlot(@NotNull EquipmentSlot p_36257_);
 
     @Shadow public abstract void startFallFlying();
 
     @Inject(method = "tryToStartFallFlying", at = @At(value = "JUMP", opcode = Opcodes.IFEQ), cancellable = true)
     private void extendedElytraCheck(CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.OFFHAND);
+        if (amethystWings$tryFlyWithStack(EquipmentSlot.MAINHAND) ||
+                amethystWings$tryFlyWithStack(EquipmentSlot.OFFHAND)) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Unique
+    private boolean amethystWings$tryFlyWithStack(EquipmentSlot slot) {
+        ItemStack itemStack = this.getItemBySlot(slot);
         if (itemStack.getItem() instanceof WingsItem item) {
             WingsCapability cap = item.getCapability(itemStack);
             if (cap.canElytra()) {
                 this.startFallFlying();
-                cir.setReturnValue(true);
+                return true;
             }
         }
+        return false;
     }
 }

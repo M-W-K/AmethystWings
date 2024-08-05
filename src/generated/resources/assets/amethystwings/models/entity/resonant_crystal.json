@@ -1,6 +1,6 @@
 {
   "parent": "amethystwings:entity/crystal",
   "textures": {
-    "layer0": "amethystwings:entity/resonant_crystal"
+    "layer0": "amethystwings:block/resonant_crystal"
   }
 }

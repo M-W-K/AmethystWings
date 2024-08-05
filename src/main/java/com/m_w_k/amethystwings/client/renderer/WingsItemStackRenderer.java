@@ -14,9 +14,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -33,7 +31,7 @@ import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final WingsModel WINGS_MODEL = new WingsModel(WingsModel.createLayer().bakeRoot());
     public static final ModelResourceLocation WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "wings_controller_inventory", "inventory");
-    public static final ResourceLocation WINGS_TEXTURE = new ResourceLocation(MODID, "textures/entity/wings_controller.png");
+    public static final ResourceLocation WINGS_TEXTURE = new ResourceLocation(MODID, "textures/block/wings_controller.png");
 
     private final static PoseStack ELYTRA_HELPER = new PoseStack();
     private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
