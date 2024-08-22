@@ -175,9 +175,9 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         Vec3 deltaMovement = entity.getDeltaMovement();
         if (elytraBoost) {
             Vec3 lookAngle = entity.getLookAngle();
-            entity.setDeltaMovement(deltaMovement.add(lookAngle.scale(2)));
+            entity.setDeltaMovement(deltaMovement.add(lookAngle.scale(AmethystWingsConfig.elytraBoostStrength)));
         } else {
-            entity.setDeltaMovement(deltaMovement.x(), 1, deltaMovement.z());
+            entity.setDeltaMovement(deltaMovement.x(), AmethystWingsConfig.boostStrength, deltaMovement.z());
         }
         takeBoostDamage(entity);
     }

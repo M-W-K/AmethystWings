@@ -100,4 +100,9 @@ public class WingsCrystalItem extends Item {
     public double getArmorToughnessContribution() {
         return armorToughnessContribution.get();
     }
+
+    @Override
+    public int getMaxStackSize(ItemStack stack) {
+        return stack.isDamaged() ? 1 : 64;
+    }
 }

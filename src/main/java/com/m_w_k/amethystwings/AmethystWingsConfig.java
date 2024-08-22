@@ -39,8 +39,16 @@ public class AmethystWingsConfig
             .defineInRange("boostDamage", 60, 0, Integer.MAX_VALUE);
 
     private static final ForgeConfigSpec.BooleanValue ALT_BOOST_DAMAGE = BUILDER
-            .comment("Whether the alternate method of dealing boost damage should be used")
+            .comment("If true, boost damage will be more evenly distributed instead of inflicted to the highest durability crystal.")
             .define("altBoostDamage", false);
+
+    private static final ForgeConfigSpec.DoubleValue BOOST_STRENGTH = BUILDER
+            .comment("The strength factor for non-elytra boosts.")
+            .defineInRange("boostStrength", 1, 0.1, 10);
+
+    private static final ForgeConfigSpec.DoubleValue ELYTRA_BOOST_STRENGTH = BUILDER
+            .comment("The strength factor for elytra boosts.")
+            .defineInRange("elytraBoostStrength", 1, 0.1, 10);
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
@@ -55,6 +63,9 @@ public class AmethystWingsConfig
     public static int boostDamage;
     public static boolean altBoostDamage;
 
+    public static double boostStrength;
+    public static double elytraBoostStrength;
+
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         resonantToughness = RESONANT_TOUGHNESS.get();
@@ -67,5 +78,8 @@ public class AmethystWingsConfig
 
         boostDamage = BOOST_DAMAGE.get();
         altBoostDamage = ALT_BOOST_DAMAGE.get();
+
+        boostStrength = BOOST_STRENGTH.get();
+        elytraBoostStrength = ELYTRA_BOOST_STRENGTH.get();
     }
 }
