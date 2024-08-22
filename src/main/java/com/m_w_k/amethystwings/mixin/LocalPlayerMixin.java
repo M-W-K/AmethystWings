@@ -36,27 +36,9 @@ public abstract class LocalPlayerMixin extends Player {
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(method = "aiStep", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 25), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void extendedElytraCheck(CallbackInfo ci, boolean flag, boolean flag1, boolean flag2, float f, boolean flag3, boolean flag4, boolean flag5, boolean flag6, boolean flag9, ItemStack itemstack) {
-        if (!this.tryToStartFallFlying()) {
-            if (this.onGround() || this.isInWater() || this.isUnderWater()) return;
-            if (!amethystWings$tryBoost(EquipmentSlot.MAINHAND))
-                amethystWings$tryBoost(EquipmentSlot.OFFHAND);
-            return;
-        }
         if (itemstack.canElytraFly(this)) return;
         if (!amethystWings$tryWingsElytra(this.getItemBySlot(EquipmentSlot.MAINHAND)))
             amethystWings$tryWingsElytra(this.getItemBySlot(EquipmentSlot.OFFHAND));
-    }
-
-    @Unique
-    private boolean amethystWings$tryBoost(EquipmentSlot slot) {
-        ItemStack stack = this.getItemBySlot(slot);
-        if (stack.getItem() instanceof WingsItem item) {
-            WingsCapability cap = item.getCapability(stack);
-            if (cap.canBoost() && this.level().isClientSide()) {
-                cap.doBoost(this, this.isFallFlying(), slot == EquipmentSlot.MAINHAND);
-            }
-        }
-        return false;
     }
 
     @Unique

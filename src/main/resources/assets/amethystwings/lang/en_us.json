@@ -17,5 +17,8 @@
   "item.amethystwings.wings_controller.attribute": "Toughness contribution: %s",
 
   "amethystwings.subtitle.crystal_shatter": "Crystal shatters",
-  "amethystwings.subtitle.crystal_damage": "Crystal cracks"
+  "amethystwings.subtitle.crystal_damage": "Crystal cracks",
+
+"key.amethystwings.boost.description": "Trigger Crystal Boost",
+"key.amethystwings.category": "Amethyst Wings"
 }

@@ -1,5 +1,6 @@
 package com.m_w_k.amethystwings;
 
+import com.m_w_k.amethystwings.client.Keybindings;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
@@ -11,9 +12,11 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -35,6 +38,7 @@ public class AmethystWingsMod {
         AmethystWingsRegistry.init(modEventBus);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::onModelRegistration);
+        modEventBus.addListener(this::registerBindings);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AmethystWingsConfig.SPEC);
     }
@@ -55,5 +59,9 @@ public class AmethystWingsMod {
         event.register(AmethystWingsModelProvider.ENERGETIC);
         event.register(AmethystWingsModelProvider.SHAPED);
         event.register(AmethystWingsModelProvider.AURIC);
+    }
+
+    public void registerBindings(RegisterKeyMappingsEvent event) {
+        event.register(Keybindings.BOOST.get());
     }
 }

@@ -318,7 +318,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return Math.log1p(Math.abs(num)) * Math.signum(num);
     }
 
-    private void handleParticles(@NotNull LivingEntity entity) {
+    public void handleParticles(@NotNull LivingEntity entity) {
         data.forNonEmpty((crystalData -> crystalData.handleParticles(entity, data.partialTicks, data.drift)));
     }
 
