@@ -3,7 +3,6 @@ package com.m_w_k.amethystwings.capability;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,33 +16,34 @@ import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
-import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public final class WingsCapDataCache {
-    private static final WeakHashMap<DataKey, WingsCapData> CACHE = new WeakHashMap<>();
-    private static int id;
+    private static final WeakHashMap<DataKey, WingsCapClientData> CACHE = new WeakHashMap<>();
 
-    private static final WingsCapData FALLBACK = new WingsCapData();
+    private static final WingsCapClientData FALLBACK = new WingsCapClientData();
 
     @Contract("_, _ -> new")
     public static @NotNull WingsCapability getCap(ItemStack stack, @Nullable Integer dataID) {
-        DataKey key;
+        DataKey key = getKey(dataID);
         if (FMLEnvironment.dist.isClient()) {
-            key = DataKey.of(dataID == null ? (int) (Math.random() * Integer.MIN_VALUE) : dataID);
-            WingsCapData data = CACHE.get(key);
+            WingsCapClientData data = CACHE.get(key);
             if (data != null) {
                 return new WingsCapability(stack, key, data);
             } else {
-                data = new WingsCapData();
+                data = new WingsCapClientData();
                 CACHE.put(key, data);
                 return new WingsCapability(stack, key, data);
             }
         } else {
-            key = DataKey.of(dataID == null ? id++ : dataID);
             return new WingsCapability(stack, key, FALLBACK);
         }
+    }
+
+    private static DataKey getKey(@Nullable Integer dataID) {
+        DataKey key = DataKey.of(dataID == null ? (int) ((Math.random() * 2 - 1) * Integer.MAX_VALUE) : dataID);
+        return dataID == null && CACHE.containsKey(key) ? getKey(null) : key;
     }
 
     public static void rebind(@NotNull DataKey oldKey, @NotNull DataKey newKey) {
@@ -51,7 +51,7 @@ public final class WingsCapDataCache {
     }
 
     @Nullable
-    public static WingsCapData accessData(int dataID) {
+    public static WingsCapClientData accessData(int dataID) {
         return CACHE.get(DataKey.of(dataID));
     }
 
@@ -71,7 +71,7 @@ public final class WingsCapDataCache {
     /**
      * Data storage primarily so that client data is not lost on cap reinit on server sync packet.
      */
-    public static final class WingsCapData {
+    public static final class WingsCapClientData {
         private final NonNullList<CrystalData> crystals = NonNullList.withSize(54, CrystalData.EMPTY);
 
         public float partialTicks;
@@ -80,7 +80,7 @@ public final class WingsCapDataCache {
         public final Vector3d drift = new Vector3d();
         public long lastBoostTick;
 
-        private WingsCapData() {}
+        private WingsCapClientData() {}
 
         // TODO where do I call this??? I'd like to clean up but anywhere I call it causes problems
         public void removeData(int slot) {

@@ -49,7 +49,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public static final WingsCapability EMPTY = new WingsCapability();
 
     private @NotNull WingsCapDataCache.DataKey dataKey;
-    private final WingsCapDataCache.WingsCapData data;
+    private final WingsCapDataCache.WingsCapClientData data;
     public final ItemStack stack;
     private final LazyOptional<WingsCapability> holder = LazyOptional.of(() -> this);
 
@@ -86,7 +86,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.data = null;
     }
 
-    protected WingsCapability(ItemStack stack, @NotNull WingsCapDataCache.DataKey dataKey, WingsCapDataCache.WingsCapData data) {
+    protected WingsCapability(ItemStack stack, @NotNull WingsCapDataCache.DataKey dataKey, WingsCapDataCache.WingsCapClientData data) {
         this.stack = stack;
         this.dataKey = dataKey;
         this.data = data;
@@ -665,7 +665,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             data().particlesStack = stack;
         }
 
-        private WingsCapDataCache.WingsCapData.CrystalData data() {
+        private WingsCapDataCache.WingsCapClientData.CrystalData data() {
             return data.getData(this.slot);
         }
 

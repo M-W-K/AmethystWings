@@ -48,7 +48,7 @@ public class CrystalParticlePacket extends PacketHandler.AbstractPacket {
 
     @OnlyIn(Dist.CLIENT)
     public static void handleClientside(CrystalParticlePacket packet) {
-        WingsCapDataCache.WingsCapData data = WingsCapDataCache.accessData(packet.dataID);
+        WingsCapDataCache.WingsCapClientData data = WingsCapDataCache.accessData(packet.dataID);
         if (data != null) {
             data.getData(packet.crystalSlot).particlesToRender += packet.count;
         }
