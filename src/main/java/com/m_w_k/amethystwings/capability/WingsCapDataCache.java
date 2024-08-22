@@ -3,6 +3,7 @@ package com.m_w_k.amethystwings.capability;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,58 +17,55 @@ import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public final class WingsCapDataCache {
-    private static final WeakHashMap<Integer, WingsCapData> CACHE = new WeakHashMap<>();
+    private static final WeakHashMap<DataKey, WingsCapData> CACHE = new WeakHashMap<>();
     private static int id;
 
     private static final WingsCapData FALLBACK = new WingsCapData();
 
-    @Contract("_ -> new")
-    public static @NotNull WingsCapability getCap(ItemStack stack) {
+    @Contract("_, _ -> new")
+    public static @NotNull WingsCapability getCap(ItemStack stack, @Nullable Integer dataID) {
+        DataKey key;
         if (FMLEnvironment.dist.isClient()) {
-            // physical client handling -- generate a unique CapID if we don't have one, and also assign data.
-            if (stack.getOrCreateTag().contains("CapID")) {
-                return handleStackWithID(stack);
+            key = DataKey.of(dataID == null ? (int) (Math.random() * Integer.MIN_VALUE) : dataID);
+            WingsCapData data = CACHE.get(key);
+            if (data != null) {
+                return new WingsCapability(stack, key, data);
             } else {
-                stack.getOrCreateTag().putInt("CapID", getUniqueID());
-                return handleStackWithID(stack);
+                data = new WingsCapData();
+                CACHE.put(key, data);
+                return new WingsCapability(stack, key, data);
             }
         } else {
-            // physical server handling -- always generate a unique CapID, but don't bother with data.
-            stack.getOrCreateTag().putInt("CapID", getUniqueID());
-            return new WingsCapability(stack, 0, FALLBACK);
+            key = DataKey.of(dataID == null ? id++ : dataID);
+            return new WingsCapability(stack, key, FALLBACK);
         }
     }
 
-    private static WingsCapability handleStackWithID(ItemStack stack) {
-        assert stack.getOrCreateTag().contains("CapID");
-
-        Integer nbtkey = stack.getOrCreateTag().getInt("CapID");
-        WingsCapData data = CACHE.get(nbtkey);
-        if (data != null) {
-            return new WingsCapability(stack, nbtkey, data);
-        } else {
-            data = new WingsCapData();
-            CACHE.put(nbtkey, data);
-            return new WingsCapability(stack, nbtkey, data);
-        }
-    }
-
-    private static int getUniqueID() {
-        // clients select a randomized negative integer, physical servers can do simple ++
-        if (FMLEnvironment.dist.isClient()) {
-            return (int) (Math.random() * Integer.MIN_VALUE);
-        } else {
-            return id++;
-        }
+    public static void rebind(@NotNull DataKey oldKey, @NotNull DataKey newKey) {
+        CACHE.put(newKey, CACHE.remove(oldKey));
     }
 
     @Nullable
     public static WingsCapData accessData(int dataID) {
-        return CACHE.get(dataID);
+        return CACHE.get(DataKey.of(dataID));
+    }
+
+    public record DataKey(int value) {
+
+        @Contract(value = "_ -> new", pure = true)
+        public static @NotNull DataKey of(int value) {
+            return new DataKey(value);
+        }
+
+        @Override
+        public int hashCode() {
+            return value;
+        }
     }
 
     /**

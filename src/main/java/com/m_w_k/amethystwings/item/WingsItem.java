@@ -35,6 +35,19 @@ public class WingsItem extends Item implements Equipable {
     }
 
     @Override
+    public @Nullable CompoundTag getShareTag(ItemStack stack) {
+        CompoundTag tag = super.getShareTag(stack);
+        if (tag != null) tag.putInt("ID", getCapability(stack).getDataID());
+        return tag;
+    }
+
+    @Override
+    public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
+        super.readShareTag(stack, nbt);
+        if (nbt != null) getCapability(stack).setDataID(nbt.getInt("ID"));
+    }
+
+    @Override
     public @NotNull UseAnim getUseAnimation(@NotNull ItemStack p_41452_) {
         return UseAnim.BLOCK;
     }
@@ -115,7 +128,8 @@ public class WingsItem extends Item implements Equipable {
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return WingsCapDataCache.getCap(stack);
+        Integer dataID = nbt == null ? null : nbt.contains("Parent") ? nbt.getInt("Parent") : null;
+        return WingsCapDataCache.getCap(stack, dataID);
     }
 
     @Override

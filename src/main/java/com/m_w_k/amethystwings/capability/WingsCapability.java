@@ -13,6 +13,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,6 +28,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -38,7 +40,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 
-public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider {
+public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider, INBTSerializable<IntTag> {
     public static final Capability<WingsCapability> WINGS_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
     private static final UUID attributeUUID = UUID.fromString("07822f19-e797-7d6a-d56d-29fcb4271b04");
@@ -46,7 +48,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     public static final WingsCapability EMPTY = new WingsCapability();
 
-    private final Integer dataKey;
+    private @NotNull WingsCapDataCache.DataKey dataKey;
     private final WingsCapDataCache.WingsCapData data;
     public final ItemStack stack;
     private final LazyOptional<WingsCapability> holder = LazyOptional.of(() -> this);
@@ -80,11 +82,11 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private WingsCapability() {
         this.stack = null;
-        this.dataKey = null;
+        this.dataKey = WingsCapDataCache.DataKey.of(0);
         this.data = null;
     }
 
-    protected WingsCapability(ItemStack stack, Integer dataKey, WingsCapDataCache.WingsCapData data) {
+    protected WingsCapability(ItemStack stack, @NotNull WingsCapDataCache.DataKey dataKey, WingsCapDataCache.WingsCapData data) {
         this.stack = stack;
         this.dataKey = dataKey;
         this.data = data;
@@ -621,6 +623,28 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         }
     }
 
+    public int getDataID() {
+        return dataKey.value();
+    }
+
+    public void setDataID(int dataID) {
+        WingsCapDataCache.DataKey dataKey = WingsCapDataCache.DataKey.of(dataID);
+        if (!dataKey.equals(this.dataKey)) {
+            WingsCapDataCache.rebind(this.dataKey, dataKey);
+            this.dataKey = dataKey;
+        }
+    }
+
+    @Override
+    public IntTag serializeNBT() {
+        return IntTag.valueOf(getDataID());
+    }
+
+    @Override
+    public void deserializeNBT(IntTag nbt) {
+        setDataID(nbt.getAsInt());
+    }
+
     public class Crystal {
 
         private WingsRenderHelper.CrystalTarget cachedTarget;
@@ -741,7 +765,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
         public void spawnParticles(@NotNull LivingEntity entity, int count) {
             if (entity.level().isClientSide()) return;
-            CrystalParticlePacket.send(entity.level(), dataKey, this.slot, count);
+            CrystalParticlePacket.send(entity.level(), getDataID(), this.slot, count);
         }
     }
 
