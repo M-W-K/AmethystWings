@@ -6,8 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class AmethystWingsConfig
-{
+public class AmethystWingsConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
     private static final ForgeConfigSpec.DoubleValue RESONANT_TOUGHNESS = BUILDER
