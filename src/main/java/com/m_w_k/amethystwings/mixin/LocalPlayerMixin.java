@@ -27,6 +27,8 @@ public abstract class LocalPlayerMixin extends Player {
 
     @Shadow @Final public ClientPacketListener connection;
 
+    @Shadow public abstract boolean isUnderWater();
+
     private LocalPlayerMixin(Level p_250508_, BlockPos p_250289_, float p_251702_, GameProfile p_252153_) {
         super(p_250508_, p_250289_, p_251702_, p_252153_);
     }
@@ -35,7 +37,7 @@ public abstract class LocalPlayerMixin extends Player {
     @Inject(method = "aiStep", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, ordinal = 25), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void extendedElytraCheck(CallbackInfo ci, boolean flag, boolean flag1, boolean flag2, float f, boolean flag3, boolean flag4, boolean flag5, boolean flag6, boolean flag9, ItemStack itemstack) {
         if (!this.tryToStartFallFlying()) {
-            if (this.onGround()) return;
+            if (this.onGround() || this.isInWater() || this.isUnderWater()) return;
             if (!amethystWings$tryBoost(EquipmentSlot.MAINHAND))
                 amethystWings$tryBoost(EquipmentSlot.OFFHAND);
             return;
