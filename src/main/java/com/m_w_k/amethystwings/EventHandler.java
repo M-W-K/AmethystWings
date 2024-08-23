@@ -1,11 +1,13 @@
 package com.m_w_k.amethystwings;
 
+import com.m_w_k.amethystwings.api.util.BoostInformation;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.Keybindings;
 import com.m_w_k.amethystwings.item.WingsItem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -20,12 +22,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.List;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID)
 public final class EventHandler {
 
     private static final List<Runnable> COOLDOWNED_WINGS = new ObjectArrayList<>();
+    private static final List<BoostInformation> FLYING_PLAYERS = new ObjectArrayList<>();
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onShieldBlock(@NotNull ShieldBlockEvent event) {
@@ -56,34 +60,27 @@ public final class EventHandler {
 
     @SubscribeEvent
     public static void onTick(TickEvent.ServerTickEvent event) {
-        if (COOLDOWNED_WINGS.size() > 0) {
+        if (!COOLDOWNED_WINGS.isEmpty()) {
             for (Runnable runnable : COOLDOWNED_WINGS) runnable.run();
             COOLDOWNED_WINGS.clear();
         }
-    }
-
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.@NotNull ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            while (Keybindings.BOOST.get().consumeClick()) {
-                if (!tryBoost(EquipmentSlot.MAINHAND))
-                    tryBoost(EquipmentSlot.OFFHAND);
+        if (!FLYING_PLAYERS.isEmpty()) {
+            Iterator<BoostInformation> iter = FLYING_PLAYERS.iterator();
+            while (iter.hasNext()) {
+                BoostInformation next = iter.next();
+                if (next.player().getY() < next.yHeightOfJump()) {
+                    next.player().getAbilities().mayfly = false;
+                    next.player().fallDistance = 0;
+                    iter.remove();
+                } else if (next.player().onGround()) {
+                    next.player().getAbilities().mayfly = false;
+                    iter.remove();
+                }
             }
         }
     }
 
-    private static boolean tryBoost(EquipmentSlot slot) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        assert player != null;
-        if (player.isUnderWater()) return true;
-        ItemStack stack = player.getItemBySlot(slot);
-        if (stack.getItem() instanceof WingsItem item) {
-            WingsCapability cap = item.getCapability(stack);
-            if (cap.canBoost()) {
-                cap.doBoost(player, player.isFallFlying(), slot == EquipmentSlot.MAINHAND);
-                return true;
-            }
-        }
-        return false;
+    public static void registerFlyingPlayer(BoostInformation information) {
+        FLYING_PLAYERS.add(information);
     }
 }

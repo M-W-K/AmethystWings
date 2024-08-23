@@ -38,7 +38,7 @@ public class AmethystWingsMod {
         AmethystWingsRegistry.init(modEventBus);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::onModelRegistration);
-        modEventBus.addListener(this::registerBindings);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(Keybindings::registerBindings));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AmethystWingsConfig.SPEC);
     }
@@ -59,9 +59,5 @@ public class AmethystWingsMod {
         event.register(AmethystWingsModelProvider.ENERGETIC);
         event.register(AmethystWingsModelProvider.SHAPED);
         event.register(AmethystWingsModelProvider.AURIC);
-    }
-
-    public void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(Keybindings.BOOST.get());
     }
 }
