@@ -5,7 +5,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static com.m_w_k.amethystwings.api.util.WingsAction.*;

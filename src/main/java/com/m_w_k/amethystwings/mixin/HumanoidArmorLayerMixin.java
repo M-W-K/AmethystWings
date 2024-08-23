@@ -1,6 +1,5 @@
 package com.m_w_k.amethystwings.mixin;
 
-import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.item.WingsItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;

@@ -2,7 +2,6 @@ package com.m_w_k.amethystwings.mixin;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
-import com.m_w_k.amethystwings.network.WingsBoostPacket;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;

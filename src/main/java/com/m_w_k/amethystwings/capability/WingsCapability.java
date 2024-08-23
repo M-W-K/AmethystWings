@@ -35,9 +35,11 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
+import org.joml.Vector3f;
 
-import java.lang.Math;
 import java.util.*;
 
 public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider, INBTSerializable<IntTag> {

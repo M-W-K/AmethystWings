@@ -1,6 +1,5 @@
 package com.m_w_k.amethystwings.registry;
 
-import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.DeferredRegister;
