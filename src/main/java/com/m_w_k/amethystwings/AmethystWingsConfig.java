@@ -38,7 +38,7 @@ public class AmethystWingsConfig {
             .defineInRange("boostDamage", 60, 0, Integer.MAX_VALUE);
 
     private static final ForgeConfigSpec.BooleanValue ALT_BOOST_DAMAGE = BUILDER
-            .comment("If true, boost damage will be more evenly distributed instead of inflicted to the highest durability crystal.")
+            .comment("If true, boost damage will be inflicted to a more random crystal instead of the highest durability crystal.")
             .define("altBoostDamage", false);
 
     private static final ForgeConfigSpec.DoubleValue BOOST_STRENGTH = BUILDER

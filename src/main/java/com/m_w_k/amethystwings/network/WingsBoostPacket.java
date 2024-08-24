@@ -1,9 +1,9 @@
 package com.m_w_k.amethystwings.network;
 
-import com.m_w_k.amethystwings.api.util.BoostInformation;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -43,9 +43,17 @@ public class WingsBoostPacket extends PacketHandler.AbstractPacket {
             if (wingStack.getItem() instanceof WingsItem item) {
                 WingsCapability cap = item.getCapability(wingStack);
                 cap.doBoost(sender, sender.isFallFlying(), mainHand);
-                BoostInformation.handle(sender);
+                PacketListener listener = ctx.get().getNetworkManager().getPacketListener();
+                if (listener instanceof AmethystWingsSGPLIMixin impl) {
+                    impl.amethystWings$resetTimeFloating();
+                }
             }
         });
         ctx.get().setPacketHandled(true);
+    }
+
+    public interface AmethystWingsSGPLIMixin {
+
+        void amethystWings$resetTimeFloating();
     }
 }

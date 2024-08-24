@@ -185,12 +185,13 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     public void takeBoostDamage(@NotNull LivingEntity owningEntity) {
+        int damage = applyDamageReduction(owningEntity, AmethystWingsConfig.boostDamage, false);
         if (AmethystWingsConfig.altBoostDamage) {
-            weightedDamage(owningEntity, crystalsBoostSortedActive.fullList, AmethystWingsConfig.boostDamage, false);
+            weightedDamage(owningEntity, crystalsBoostSortedActive.fullList, damage, false);
         } else {
             Iterator<Crystal> boostCrystals = crystalsBoostSortedActive.fullList.iterator();
             if (!boostCrystals.hasNext()) return;
-            boostCrystals.next().damage(owningEntity, applyDamageReduction(owningEntity, AmethystWingsConfig.boostDamage, false));
+            boostCrystals.next().damage(owningEntity, damage);
         }
         handleShatteredCrystals(owningEntity);
     }

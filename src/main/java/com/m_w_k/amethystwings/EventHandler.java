@@ -1,6 +1,5 @@
 package com.m_w_k.amethystwings;
 
-import com.m_w_k.amethystwings.api.util.BoostInformation;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -17,14 +16,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID)
 public final class EventHandler {
 
     private static final List<Runnable> COOLDOWNED_WINGS = new ObjectArrayList<>();
-    private static final List<BoostInformation> FLYING_PLAYERS = new ObjectArrayList<>();
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onShieldBlock(@NotNull ShieldBlockEvent event) {
@@ -59,23 +56,5 @@ public final class EventHandler {
             for (Runnable runnable : COOLDOWNED_WINGS) runnable.run();
             COOLDOWNED_WINGS.clear();
         }
-        if (!FLYING_PLAYERS.isEmpty()) {
-            Iterator<BoostInformation> iter = FLYING_PLAYERS.iterator();
-            while (iter.hasNext()) {
-                BoostInformation next = iter.next();
-                if (next.player().getY() < next.yHeightOfJump()) {
-                    next.player().getAbilities().mayfly = false;
-                    next.player().fallDistance = 0;
-                    iter.remove();
-                } else if (next.player().onGround()) {
-                    next.player().getAbilities().mayfly = false;
-                    iter.remove();
-                }
-            }
-        }
-    }
-
-    public static void registerFlyingPlayer(BoostInformation information) {
-        FLYING_PLAYERS.add(information);
     }
 }
