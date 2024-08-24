@@ -2,6 +2,8 @@ package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.Entity;
@@ -10,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,11 +20,14 @@ import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID)
 public final class EventHandler {
 
     private static final List<Runnable> COOLDOWNED_WINGS = new ObjectArrayList<>();
+    private static final Object2DoubleOpenHashMap<UUID> BOOSTED_ENTITIES = new Object2DoubleOpenHashMap<>();
+    private static final Object2IntOpenHashMap<UUID> BOOSTED_ENTITIES_DECAY_TIMES = new Object2IntOpenHashMap<>();
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onShieldBlock(@NotNull ShieldBlockEvent event) {
@@ -56,5 +62,37 @@ public final class EventHandler {
             for (Runnable runnable : COOLDOWNED_WINGS) runnable.run();
             COOLDOWNED_WINGS.clear();
         }
+        if (event.getServer().getTickCount() % 617 == 0) {
+            int tick = event.getServer().getTickCount();
+            var iter = BOOSTED_ENTITIES_DECAY_TIMES.object2IntEntrySet().fastIterator();
+            while (iter.hasNext()) {
+                var entry = iter.next();
+                if (entry.getIntValue() < tick) iter.remove();
+            }
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        if (BOOSTED_ENTITIES.isEmpty() || event.getEntity().level().isClientSide()) return;
+        UUID uuid = event.getEntity().getUUID();
+        if (BOOSTED_ENTITIES.containsKey(uuid)) {
+            double actualFall = BOOSTED_ENTITIES.getDouble(uuid) - event.getEntity().getY();
+            if (actualFall <= 0) event.setCanceled(true);
+            if (actualFall < event.getDistance()) event.setDistance((float) actualFall);
+            BOOSTED_ENTITIES.removeDouble(uuid);
+            BOOSTED_ENTITIES_DECAY_TIMES.removeInt(uuid);
+        }
+    }
+
+    public static void markBoosted(@NotNull LivingEntity entity) {
+        if (entity.getServer() == null) return;
+        BOOSTED_ENTITIES.put(entity.getUUID(), entity.getY());
+        BOOSTED_ENTITIES_DECAY_TIMES.put(entity.getUUID(), entity.getServer().getTickCount() + computeDecayTime());
+    }
+
+    private static int computeDecayTime() {
+        return (int) (AmethystWingsConfig.boostStrength * AmethystWingsConfig.boostStrength * 600);
     }
 }

@@ -3,6 +3,7 @@ package com.m_w_k.amethystwings.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.AmethystWingsConfig;
+import com.m_w_k.amethystwings.EventHandler;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
@@ -172,7 +173,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             if (tick < data.lastBoostTick + 20) return;
             data.lastBoostTick = tick;
             WingsBoostPacket.send(mainHand);
-        }
+        } else if (!elytraBoost) EventHandler.markBoosted(entity);
 
         Vec3 deltaMovement = entity.getDeltaMovement();
         if (elytraBoost) {
