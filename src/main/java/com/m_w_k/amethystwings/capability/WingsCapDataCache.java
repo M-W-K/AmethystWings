@@ -46,8 +46,15 @@ public final class WingsCapDataCache {
         return dataID == null && CACHE.containsKey(key) ? getKey(null) : key;
     }
 
-    public static void rebind(@NotNull DataKey oldKey, @NotNull DataKey newKey) {
-        CACHE.put(newKey, CACHE.remove(oldKey));
+    public static WingsCapClientData rebind(@NotNull DataKey oldKey, @NotNull DataKey newKey) {
+        WingsCapClientData data = CACHE.get(newKey);
+        if (data != null) {
+            CACHE.remove(oldKey);
+        } else {
+            data = CACHE.remove(oldKey);
+            CACHE.put(newKey, data);
+        }
+        return data;
     }
 
     @Nullable
@@ -115,7 +122,7 @@ public final class WingsCapDataCache {
             public int particlesToRender;
 
             void handleParticles(@NotNull LivingEntity entity, double partialTicks, Vector3d drift) {
-                if (!entity.level().isClientSide() || particlesToRender == 0) return;
+                if (!entity.level().isClientSide() || particlesToRender == 0 || particlesStack == null) return;
                 ItemParticleOption option = new ItemParticleOption(ParticleTypes.ITEM, particlesStack);
 
                 Vector3f pos = entity.position().toVector3f().add(lerpPosition(partialTicks, drift));

@@ -52,7 +52,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public static final WingsCapability EMPTY = new WingsCapability();
 
     private @NotNull WingsCapDataCache.DataKey dataKey;
-    private final WingsCapDataCache.WingsCapClientData data;
+    private WingsCapDataCache.WingsCapClientData data;
     public final ItemStack stack;
     private final LazyOptional<WingsCapability> holder = LazyOptional.of(() -> this);
 
@@ -634,7 +634,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public void setDataID(int dataID) {
         WingsCapDataCache.DataKey dataKey = WingsCapDataCache.DataKey.of(dataID);
         if (!dataKey.equals(this.dataKey)) {
-            WingsCapDataCache.rebind(this.dataKey, dataKey);
+            this.data = WingsCapDataCache.rebind(this.dataKey, dataKey);
             this.dataKey = dataKey;
         }
     }
