@@ -5,16 +5,22 @@ import com.m_w_k.amethystwings.capability.WingsCapDataCache;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.inventory.WingsContainer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
@@ -26,6 +32,7 @@ import net.minecraftforge.common.util.NonNullLazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class WingsItem extends Item implements Equipable {
@@ -60,17 +67,31 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (player.isShiftKeyDown()) {
-            if (!level.isClientSide()) {
-                WingsContainer.openGUI((ServerPlayer) player, hand);
-            }
-            return InteractionResultHolder.success(stack);
-        } else if (getUseDuration(stack) != 0) {
+        if (getUseDuration(stack) != 0) {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(stack);
         } else {
             return InteractionResultHolder.pass(stack);
         }
+    }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(@NotNull ItemStack stack, @NotNull ItemStack incoming, @NotNull Slot slot,
+                                            @NotNull ClickAction action, @NotNull Player player, @NotNull SlotAccess accessor) {
+        if (action != ClickAction.SECONDARY || !incoming.isEmpty() || slot.container != player.getInventory() ||
+                (player.hasContainerOpen() && player.containerMenu instanceof InventoryMenu) ||
+                !slot.mayPickup(player)) return false;
+        WingsCapability cap = getCapability(stack);
+        if (cap != WingsCapability.EMPTY) {
+            if (player instanceof ServerPlayer p) WingsContainer.openGUI(p, slot.getContainerSlot());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack p_41421_, @Nullable Level p_41422_, @NotNull List<Component> list, @NotNull TooltipFlag p_41424_) {
+        list.add(Component.translatable("item.amethystwings.wings_controller.tooltip").withStyle(ChatFormatting.GOLD));
     }
 
     @Override

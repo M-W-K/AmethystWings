@@ -5,7 +5,6 @@ import com.m_w_k.amethystwings.gui.menu.WingsMenu;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,19 +19,17 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
 
     protected final WingsCapability capability;
     protected final ItemStack selfStack;
-    protected final InteractionHand hand;
+    protected final int stackSlot;
 
-    public WingsContainer(ItemStack wingsStack, Player player, InteractionHand hand) {
-        this.selfStack = wingsStack;
-        this.hand = hand;
+    public WingsContainer(Player player, int stackSlot) {
+        this.selfStack = player.getInventory().getItem(stackSlot);
+        this.stackSlot = stackSlot;
         this.capability = this.selfStack.getCapability(WingsCapability.WINGS_CAPABILITY)
                 .orElse(WingsCapability.EMPTY);
     }
 
-    public static void openGUI(ServerPlayer player, InteractionHand hand) {
-        if (!player.level().isClientSide()) {
-            NetworkHooks.openScreen(player, new WingsContainer(player.getItemInHand(hand), player, hand));
-        }
+    public static void openGUI(ServerPlayer player, int stackSlot) {
+        NetworkHooks.openScreen(player, new WingsContainer(player, stackSlot), buf -> buf.writeVarInt(stackSlot));
     }
 
     @Override
@@ -48,7 +45,7 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerID, @NotNull Inventory inventory, @NotNull Player player) {
-        return new WingsMenu(containerID, inventory, this);
+        return new WingsMenu(containerID, inventory, this, stackSlot);
     }
 
     @Override
@@ -93,7 +90,7 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
 
     @Override
     public boolean stillValid(@NotNull Player player) {
-        return player.getItemInHand(this.hand) == this.selfStack;
+        return player.getInventory().getItem(stackSlot) == this.selfStack;
     }
 
     @Override
