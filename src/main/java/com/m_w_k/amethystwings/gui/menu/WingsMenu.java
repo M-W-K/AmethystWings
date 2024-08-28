@@ -1,6 +1,7 @@
 package com.m_w_k.amethystwings.gui.menu;
 
 import com.m_w_k.amethystwings.inventory.WingsContainer;
+import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.registry.AmethystWingsGUIRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -27,7 +28,7 @@ public class WingsMenu extends AbstractContainerMenu {
 
         for(int j = 0; j < 6; ++j) {
             for(int k = 0; k < 9; ++k) {
-                this.addSlot(p_39232_, k + j * 9, 8 + k * 18, 18 + j * 18);
+                this.addSlot(new CrystalSlot(p_39232_, k + j * 9, 8 + k * 18, 18 + j * 18));
             }
         }
 
@@ -107,6 +108,18 @@ public class WingsMenu extends AbstractContainerMenu {
         return this.container.stillValid(p_38874_);
     }
 
+    protected static class CrystalSlot extends Slot {
+
+        public CrystalSlot(Container p_40223_, int p_40224_, int p_40225_, int p_40226_) {
+            super(p_40223_, p_40224_, p_40225_, p_40226_);
+        }
+
+        @Override
+        public boolean mayPlace(@NotNull ItemStack stack) {
+            return stack.getItem() instanceof WingsCrystalItem;
+        }
+    }
+
     protected static class DisabledSlot extends Slot {
 
         public DisabledSlot(Container p_40223_, int p_40224_, int p_40225_, int p_40226_) {
@@ -114,7 +127,17 @@ public class WingsMenu extends AbstractContainerMenu {
         }
 
         @Override
+        public boolean mayPlace(@NotNull ItemStack p_40231_) {
+            return false;
+        }
+
+        @Override
         public boolean mayPickup(@NotNull Player p_40228_) {
+            return false;
+        }
+
+        @Override
+        public boolean isHighlightable() {
             return false;
         }
     }

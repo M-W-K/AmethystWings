@@ -29,6 +29,13 @@ public class WingsScreen extends AbstractContainerScreen<WingsMenu> implements M
         super.slotClicked(p_97778_, p_97779_, p_97780_, p_97781_);
     }
 
+    public void render(@NotNull GuiGraphics p_281745_, int p_282145_, int p_282358_, float p_283566_) {
+        this.renderBackground(p_281745_);
+        super.render(p_281745_, p_282145_, p_282358_, p_283566_);
+        if (this.hoveredSlot == null || this.hoveredSlot.getContainerSlot() == this.getMenu().lockedslot) return;
+        this.renderTooltip(p_281745_, p_282145_, p_282358_);
+    }
+
     @Override
     protected void renderBg(GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
         int i = (this.width - this.imageWidth) / 2;
