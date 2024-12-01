@@ -5,6 +5,7 @@ import com.m_w_k.amethystwings.capability.WingsCapDataCache;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
 import com.m_w_k.amethystwings.inventory.WingsContainer;
+import com.m_w_k.amethystwings.network.WingsContainerOpenPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
@@ -83,7 +84,7 @@ public class WingsItem extends Item implements Equipable {
                 !slot.mayPickup(player)) return false;
         WingsCapability cap = getCapability(stack);
         if (cap != WingsCapability.EMPTY) {
-            if (player instanceof ServerPlayer p) WingsContainer.openGUI(p, slot.getContainerSlot());
+            if (player.level().isClientSide()) WingsContainerOpenPacket.send(slot.getContainerSlot());
             return true;
         }
         return false;

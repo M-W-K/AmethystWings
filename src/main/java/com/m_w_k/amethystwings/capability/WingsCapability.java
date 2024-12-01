@@ -9,6 +9,7 @@ import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.network.CrystalParticlePacket;
 import com.m_w_k.amethystwings.network.WingsBoostPacket;
+import com.m_w_k.amethystwings.registry.AmethystWingsItemsRegistry;
 import com.m_w_k.amethystwings.registry.AmethystWingsSoundsRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Direction;
@@ -53,7 +54,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private @NotNull WingsCapDataCache.DataKey dataKey;
     private WingsCapDataCache.WingsCapClientData data;
-    public final ItemStack stack;
+    public final @Nullable ItemStack stack;
     private final LazyOptional<WingsCapability> holder = LazyOptional.of(() -> this);
 
     private CompoundTag cachedTag;
@@ -283,7 +284,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     private int applyDamageReduction(@NotNull LivingEntity owningEntity, double damage, boolean isBlock) {
-        int unbreakingDivisor = 1 + this.stack.getEnchantmentLevel(Enchantments.UNBREAKING);
+        int unbreakingDivisor = stack == null ? 1 : 1 + this.stack.getEnchantmentLevel(Enchantments.UNBREAKING);
         if (isBlock) damage = (damage * 0.4 / unbreakingDivisor) + damage * 0.6;
         else damage = damage / unbreakingDivisor;
 
@@ -377,16 +378,15 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     @Override
     @NotNull
-    public ItemStack getStackInSlot(int slot)
-    {
+    public ItemStack getStackInSlot(int slot) {
+        if (this == EMPTY) return ItemStack.EMPTY;
         validateSlotIndex(slot);
         return getItemList().get(slot);
     }
 
     @Override
     @NotNull
-    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)
-    {
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
         if (stack.isEmpty())
             return ItemStack.EMPTY;
 
@@ -491,8 +491,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     @Override
-    public void setStackInSlot(int slot, @NotNull ItemStack stack)
-    {
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        if (this == EMPTY) return;
         validateSlotIndex(slot);
         if (!isItemValid(slot, stack)) throw new RuntimeException("Invalid stack " + stack + " for slot " + slot + ")");
         NonNullList<ItemStack> itemStacks = getItemList();
@@ -513,8 +513,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         setItemList(itemStacks);
     }
 
-    private NonNullList<ItemStack> getItemList()
-    {
+    private NonNullList<ItemStack> getItemList() {
+        if (stack == null) return NonNullList.create();
         CompoundTag rootTag = this.stack.getOrCreateTag();
         if (cachedTag == null || !cachedTag.equals(rootTag))
             itemStacksCache = refreshItemList(rootTag);
@@ -532,8 +532,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return itemStacks;
     }
 
-    private void setItemList(NonNullList<ItemStack> itemStacks)
-    {
+    private void setItemList(NonNullList<ItemStack> itemStacks) {
+        if (this.stack == null) return;
         CompoundTag existing = this.stack.getOrCreateTag();
         ContainerHelper.saveAllItems(existing, itemStacks);
         cachedTag = existing;

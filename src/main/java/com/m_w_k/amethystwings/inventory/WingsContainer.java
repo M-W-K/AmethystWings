@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings.inventory;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.gui.menu.WingsMenu;
+import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -17,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class WingsContainer implements MenuProvider, Nameable, Container {
 
-    protected final WingsCapability capability;
-    protected final ItemStack selfStack;
+    protected WingsCapability capability;
+    protected ItemStack selfStack;
     protected final int stackSlot;
 
     public WingsContainer(Player player, int stackSlot) {
@@ -90,7 +91,17 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
 
     @Override
     public boolean stillValid(@NotNull Player player) {
-        return player.getInventory().getItem(stackSlot) == this.selfStack;
+        if (capability == WingsCapability.EMPTY) return false;
+        ItemStack stack = player.getInventory().getItem(stackSlot);
+        if (stack == this.selfStack) return true;
+        WingsCapability cap = stack.getCapability(WingsCapability.WINGS_CAPABILITY).orElse(WingsCapability.EMPTY);
+        if (cap == WingsCapability.EMPTY) return false;
+        if (cap.getDataID() == capability.getDataID()) {
+            selfStack = stack;
+            capability = cap;
+            return true;
+        }
+        return false;
     }
 
     @Override

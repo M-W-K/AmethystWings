@@ -27,6 +27,8 @@ public abstract class PacketHandler {
                 WingsBoostPacket::encode, WingsBoostPacket::new, WingsBoostPacket::handle);
         INSTANCE.registerMessage(id++, CrystalParticlePacket.class,
                 CrystalParticlePacket::encode, CrystalParticlePacket::new, CrystalParticlePacket::handle);
+        INSTANCE.registerMessage(id++, WingsContainerOpenPacket.class, WingsContainerOpenPacket::encode,
+                WingsContainerOpenPacket::new, WingsContainerOpenPacket::handle);
     }
 
     protected static void sendToServer(AbstractPacket packet) {

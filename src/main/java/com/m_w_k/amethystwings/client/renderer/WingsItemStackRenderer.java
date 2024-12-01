@@ -127,6 +127,7 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     private static void renderCrystal(WingsCapability cap, @NotNull WingsCapability.Crystal crystal, @NotNull PoseStack poseStack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+        if (cap.stack == null) return;
         poseStack.pushPose();
         poseStack.translate(0.5, 0.5, 0.5);
         ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
