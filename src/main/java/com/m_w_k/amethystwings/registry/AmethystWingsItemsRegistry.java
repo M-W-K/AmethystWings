@@ -48,6 +48,7 @@ public class AmethystWingsItemsRegistry {
     private static Object2DoubleMap<Attribute> auricAttribute() {
         Object2DoubleMap<Attribute> ret = new Object2DoubleArrayMap<>();
         ret.put(Attributes.ARMOR_TOUGHNESS, AmethystWingsConfig.auricToughness);
+        ret.put(Attributes.KNOCKBACK_RESISTANCE, 0.05);
         return ret;
     }
 }
