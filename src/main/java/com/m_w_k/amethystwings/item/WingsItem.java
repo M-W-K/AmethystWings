@@ -4,13 +4,11 @@ import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.capability.WingsCapDataCache;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
-import com.m_w_k.amethystwings.inventory.WingsContainer;
 import com.m_w_k.amethystwings.network.WingsContainerOpenPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -127,7 +125,7 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         WingsCapability cap = getCapability(stack);
-        if (slot == EquipmentSlot.OFFHAND && cap.hasToughness()) {
+        if (slot == EquipmentSlot.OFFHAND) {
             return cap.getAttributes();
         }
         return super.getAttributeModifiers(slot, stack);

@@ -9,8 +9,9 @@ import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.network.CrystalParticlePacket;
 import com.m_w_k.amethystwings.network.WingsBoostPacket;
-import com.m_w_k.amethystwings.registry.AmethystWingsItemsRegistry;
 import com.m_w_k.amethystwings.registry.AmethystWingsSoundsRegistry;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -22,7 +23,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +47,6 @@ import java.util.*;
 public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvider, INBTSerializable<IntTag> {
     public static final Capability<WingsCapability> WINGS_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    private static final UUID attributeUUID = UUID.fromString("07822f19-e797-7d6a-d56d-29fcb4271b04");
     private final Multimap<Attribute, AttributeModifier> attributes = HashMultimap.create(1,1);
 
     public static final WingsCapability EMPTY = new WingsCapability();
@@ -69,7 +68,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private static Matrix4f RIGHT_WING_MATRIX;
     private static Matrix4f LEFT_WING_MATRIX;
 
-    private double armorToughnessContribution;
     private static final int MIN_SHIELD_CRYSTALS = 8;
     private static final int MAX_SHIELD_CRYSTALS = 20;
     private static final int MIN_ELYTRA_CRYSTALS = 18;
@@ -96,10 +94,6 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.data = data;
         getItemList();
         onContentsChanged();
-    }
-
-    public boolean hasToughness() {
-        return this.armorToughnessContribution > 0;
     }
 
     public Multimap<Attribute, AttributeModifier> getAttributes() {
@@ -541,7 +535,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     }
 
     private void onContentsChanged() {
-        this.armorToughnessContribution = 0;
+        this.attributes.clear();
+        Object2DoubleMap<Attribute> attributeAccumulation = new Object2DoubleOpenHashMap<>();
         this.crystals.clear();
         this.crystalsShieldSorted.clear();
         this.crystalsElytraSorted.clear();
@@ -551,7 +546,9 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             ItemStack stack = stacks.get(i);
             if (stack.getItem() instanceof WingsCrystalItem item) {
                 Crystal crystal = new Crystal(stack, i);
-                this.armorToughnessContribution += item.getArmorToughnessContribution();
+                for (var entry : item.getAttributeContributions().object2DoubleEntrySet()) {
+                    attributeAccumulation.mergeDouble(entry.getKey(), entry.getDoubleValue(), Double::sum);
+                }
                 this.crystals.add(crystal);
                 if (item.supportsActions()) {
                     if (item.isActionSupported(WingsAction.SHIELD)) this.crystalsShieldSorted.add(crystal);
@@ -563,10 +560,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.crystalsShieldSorted.truncate(MAX_SHIELD_CRYSTALS);
         this.crystalsElytraSorted.sort();
         this.crystalsBoostSorted.sort();
-        if (this.armorToughnessContribution > 0) {
-            this.attributes.removeAll(Attributes.ARMOR_TOUGHNESS);
-            this.attributes.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(attributeUUID, "Armor toughness",
-                    this.armorToughnessContribution, AttributeModifier.Operation.ADDITION));
+        if (!attributeAccumulation.isEmpty()) {
+            for (var entry : attributeAccumulation.object2DoubleEntrySet()) {
+                this.attributes.put(entry.getKey(), new AttributeModifier("Crystal " + entry.getKey().getDescriptionId(), entry.getDoubleValue(), AttributeModifier.Operation.ADDITION));
+            }
         }
         initActiveLists();
     }

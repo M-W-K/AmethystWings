@@ -15,7 +15,7 @@
   "item.amethystwings.wings_controller.action.shield": "Shield",
   "item.amethystwings.wings_controller.action.elytra": "Elytra",
   "item.amethystwings.wings_controller.action.boost": "Boost",
-  "item.amethystwings.wings_controller.attribute": "Toughness contribution: %s",
+  "item.amethystwings.wings_controller.attribute": "When in Wings Controller:",
 
   "amethystwings.subtitle.crystal_shatter": "Crystal shatters",
   "amethystwings.subtitle.crystal_damage": "Crystal cracks",
