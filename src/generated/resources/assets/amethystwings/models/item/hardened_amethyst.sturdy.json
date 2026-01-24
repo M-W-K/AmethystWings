@@ -1,0 +1,6 @@
+{
+  "parent": "amethystwings:item/hardened_amethyst",
+  "textures": {
+    "layer1": "amethystwings:item/modifier/sturdy"
+  }
+}

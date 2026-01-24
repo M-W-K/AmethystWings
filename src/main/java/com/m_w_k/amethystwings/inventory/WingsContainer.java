@@ -2,7 +2,6 @@ package com.m_w_k.amethystwings.inventory;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.gui.menu.WingsMenu;
-import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;

@@ -1,13 +1,16 @@
 package com.m_w_k.amethystwings.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
+import com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -53,5 +56,11 @@ public abstract class LivingEntityMixin extends Entity {
             return cap.canElytra() && cap.elytraFlightTick(thiss, this.fallFlyTicks);
         }
         return false;
+    }
+
+    @ModifyReturnValue(method = "createLivingAttributes", at = @At("RETURN"))
+    private static AttributeSupplier.Builder attachWarding(AttributeSupplier.Builder builder) {
+        return builder.add(AmethystWingsAttributeRegistry.WARDING.get())
+                .add(AmethystWingsAttributeRegistry.BARRIER.get());
     }
 }

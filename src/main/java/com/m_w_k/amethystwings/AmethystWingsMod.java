@@ -2,6 +2,8 @@ package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.client.Keybindings;
 import com.m_w_k.amethystwings.client.renderer.WingsItemStackRenderer;
+import com.m_w_k.amethystwings.datagen.AmethystWingsBlockTagsProvider;
+import com.m_w_k.amethystwings.datagen.AmethystWingsItemTagsProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
 import com.m_w_k.amethystwings.network.PacketHandler;
@@ -46,7 +48,10 @@ public class AmethystWingsMod {
         PackOutput packOutput = gen.getPackOutput();
         ExistingFileHelper helper = event.getExistingFileHelper();
         gen.addProvider(event.includeServer(), new AmethystWingsRecipeProvider(packOutput));
-        gen.addProvider(event.includeServer(), new AmethystWingsModelProvider(packOutput, helper));
+        gen.addProvider(event.includeClient(), new AmethystWingsModelProvider(packOutput, helper));
+        AmethystWingsBlockTagsProvider blocks = new AmethystWingsBlockTagsProvider(packOutput, event.getLookupProvider(), MODID, helper);
+        gen.addProvider(event.includeServer(), blocks);
+        gen.addProvider(event.includeServer(), new AmethystWingsItemTagsProvider(packOutput, event.getLookupProvider(), blocks.contentsGetter(), MODID, helper));
     }
 
     public void onModelRegistration(ModelEvent.RegisterAdditional event) {

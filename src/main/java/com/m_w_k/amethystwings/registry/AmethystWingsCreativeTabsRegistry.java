@@ -18,12 +18,6 @@ public class AmethystWingsCreativeTabsRegistry {
             .withTabsBefore(CreativeModeTabs.COMBAT)
             .icon(() -> AmethystWingsItemsRegistry.TREATED_AMETHYST.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(AmethystWingsItemsRegistry.WINGS.get());
-                output.accept(AmethystWingsItemsRegistry.TREATED_AMETHYST.get());
-                output.accept(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get());
-                output.accept(AmethystWingsItemsRegistry.AURIC_AMETHYST.get());
-                output.accept(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get());
-                output.accept(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get());
-                output.accept(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get());
+                AmethystWingsItemsRegistry.ITEMS.getEntries().forEach(o -> output.accept(o.get()));
             }).build());
 }

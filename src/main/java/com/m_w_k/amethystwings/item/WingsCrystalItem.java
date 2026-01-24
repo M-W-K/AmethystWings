@@ -1,5 +1,6 @@
 package com.m_w_k.amethystwings.item;
 
+import com.m_w_k.amethystwings.CrystalStats;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
@@ -16,52 +17,32 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class WingsCrystalItem extends Item {
-    private final EnumSet<WingsAction> supportedActions;
-    private final Supplier<Object2DoubleMap<Attribute>> attributeContributions;
-    private final byte priority;
-    private final Supplier<Byte> mass;
+    private final @NotNull ResourceLocation wingsModelLoc;
+    private final @Nullable EnumSet<WingsAction> supportedActions;
+    private final @Nullable Supplier<Object2DoubleMap<Attribute>> attributeContributions;
+    private final int priority;
+    private final @Nullable IntSupplier mass;
+    private final @Nullable DoubleSupplier shatterMult;
+    private final @Nullable DoubleSupplier boostBonus;
 
-    private final ResourceLocation wingsModelLoc;
-
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, @Nullable Object2DoubleMap<Attribute> attributeContributions, ResourceLocation wingsModelLoc, WingsAction supportedAction, WingsAction... supportedActions) {
+    public WingsCrystalItem(Item.Properties properties, CrystalStats stats) {
         super(properties);
-        this.supportedActions = supportedAction.isNone() ? null : EnumSet.of(supportedAction, supportedActions);
-        this.priority = priority;
-        this.mass = () -> mass;
-        this.attributeContributions = attributeContributions == null ? null : () -> attributeContributions;
-        this.wingsModelLoc = wingsModelLoc;
-    }
-
-    public WingsCrystalItem(Item.Properties properties, byte priority, Supplier<Byte> mass, Supplier<Object2DoubleMap<Attribute>> attributeContributions, ResourceLocation wingsModelLoc, WingsAction supportedAction, WingsAction... supportedActions) {
-        super(properties);
-        this.supportedActions = supportedAction.isNone() ? null : EnumSet.of(supportedAction, supportedActions);
-        this.priority = priority;
-        this.mass = mass;
-        this.attributeContributions = attributeContributions;
-        this.wingsModelLoc = wingsModelLoc;
-    }
-
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, Supplier<Object2DoubleMap<Attribute>> attributeContributions, ResourceLocation wingsModelLoc, WingsAction supportedAction, WingsAction... supportedActions) {
-        super(properties);
-        this.supportedActions = supportedAction.isNone() ? null : EnumSet.of(supportedAction, supportedActions);
-        this.priority = priority;
-        this.mass = () -> mass;
-        this.attributeContributions = attributeContributions;
-        this.wingsModelLoc = wingsModelLoc;
-    }
-
-    public WingsCrystalItem(Item.Properties properties, byte priority, byte mass, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
-        this(properties, priority, mass, (Object2DoubleMap<Attribute>) null, wingsRenderTexture, supportedAction, supportedActions);
-    }
-
-    public WingsCrystalItem(Item.Properties properties, byte priority, Supplier<Byte> mass, ResourceLocation wingsRenderTexture, WingsAction supportedAction, WingsAction... supportedActions) {
-        this(properties, priority, mass, null, wingsRenderTexture, supportedAction, supportedActions);
+        this.wingsModelLoc = stats.getWingsModelLoc();
+        this.supportedActions = stats.getSupportedActions();
+        this.attributeContributions = stats.getAttributeContributions();
+        this.priority = stats.getPriority();
+        this.mass = stats.getMass();
+        this.shatterMult = stats.getShatterMult();
+        this.boostBonus = stats.getBoostBonus();
     }
 
     @Override
@@ -70,14 +51,15 @@ public class WingsCrystalItem extends Item {
     }
 
 
-    public ResourceLocation getWingsModelLoc() {
+    public @NotNull ResourceLocation getWingsModelLoc() {
         return this.wingsModelLoc;
     }
 
-    public boolean supportsActions() {
+    public final boolean supportsActions() {
         return supportedActions != null;
     }
 
+    @UnknownNullability
     public EnumSet<WingsAction> getSupportedActions() {
         return supportedActions;
     }
@@ -90,6 +72,7 @@ public class WingsCrystalItem extends Item {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> components, @NotNull TooltipFlag toolflag) {
         super.appendHoverText(stack, level, components, toolflag);
+        components.add(Component.translatableWithFallback(getDescriptionId(stack) + ".tooltip", "").withStyle(ChatFormatting.GRAY));
         if (supportsActions()) getSupportedActions().forEach((action) -> action.appendHoverText(components));
         if (this.attributeContributions != null) {
             Object2DoubleMap<Attribute> contributions = attributeContributions.get();
@@ -114,12 +97,23 @@ public class WingsCrystalItem extends Item {
         }
     }
 
-    public byte getPriority() {
+    public int getPriority() {
         return priority;
     }
 
-    public byte getMass() {
-        return mass.get();
+    public int getMass() {
+        if (mass == null) return 5;
+        return mass.getAsInt();
+    }
+
+    public double getShatterMult() {
+        if (shatterMult == null) return 1;
+        return shatterMult.getAsDouble();
+    }
+
+    public double getBoostBonus() {
+        if (boostBonus == null) return 0;
+        return boostBonus.getAsDouble();
     }
 
     public @NotNull Object2DoubleMap<Attribute> getAttributeContributions() {

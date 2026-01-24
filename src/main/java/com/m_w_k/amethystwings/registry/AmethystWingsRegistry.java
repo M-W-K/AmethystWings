@@ -4,6 +4,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 
 public class AmethystWingsRegistry {
     public static void init(IEventBus modEventBus) {
+        AmethystWingsAttributeRegistry.ATTRIBUTES.register(modEventBus);
         AmethystWingsItemsRegistry.ITEMS.register(modEventBus);
         AmethystWingsGUIRegistry.MENU_TYPES.register(modEventBus);
         AmethystWingsCreativeTabsRegistry.CREATIVE_MODE_TABS.register(modEventBus);

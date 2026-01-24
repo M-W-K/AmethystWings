@@ -1,12 +1,9 @@
 package com.m_w_k.amethystwings.network;
 
-import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.inventory.WingsContainer;
 import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.PacketListener;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

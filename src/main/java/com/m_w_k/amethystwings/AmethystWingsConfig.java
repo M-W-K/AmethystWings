@@ -49,6 +49,50 @@ public class AmethystWingsConfig {
             .comment("The strength factor for elytra boosts.")
             .defineInRange("elytraBoostStrength", 1, 0.1, 10);
 
+    private static final ForgeConfigSpec.Builder MODIFIERS = BUILDER.push("Modifiers");
+
+    private static final ForgeConfigSpec.DoubleValue RESONANT_MOD_SPATIAL = BUILDER
+            .comment("The reach distance granted by the Spatial mod.")
+            .defineInRange("modSpatialEffect", 0.3, 0.1, 2);
+    private static final ForgeConfigSpec.DoubleValue RESONANT_MOD_LUCKY = BUILDER
+            .comment("The luck granted by the Lucky mod.")
+            .defineInRange("modLuckyEffect", 0.1, 0.01, 1);
+    private static final ForgeConfigSpec.DoubleValue HARDENED_MOD_WARDING = BUILDER
+            .comment("The flat damage reduction granted by the Warding mod.",
+                    "Damage reduction applies to anything blocked by armor or classified as magic.",
+                    "Cannot reduce incoming damage below 1, and applies before other sources of damage reduction.")
+            .defineInRange("modWardingEffect", 0.5, 0.1, 1);
+    private static final ForgeConfigSpec.DoubleValue HARDENED_MOD_REINFORCED = BUILDER
+            .comment("The shatter multiplier granted by the Reinforced mod.",
+                    "Crystal durability will be reduced by its max durability times this value when hit by an axe.")
+            .defineInRange("modReinforcedEffect", 0.5, 0.1, 1);
+    private static final ForgeConfigSpec.DoubleValue ENERGETIC_MOD_EMPOWERED = BUILDER
+            .comment("The boost power increase granted by the Empowered mod.")
+            .defineInRange("modEmpoweredEffect", 0.06, 0.01, 1);
+    private static final ForgeConfigSpec.DoubleValue ENERGETIC_MOD_ENHANCING = BUILDER
+            .comment("The speed and swim boost granted by the Enhancing mod.")
+            .defineInRange("modEnhancingEffect", 0.03, 0.01, 0.5);
+    private static final ForgeConfigSpec.DoubleValue SHAPED_MOD_FLOATY = BUILDER
+            .comment("The gravity decrease granted by the Floaty mod.")
+            .defineInRange("modFloatyEffect", 0.05, 0.01, 0.1);
+    private static final ForgeConfigSpec.DoubleValue SHAPED_MOD_HEAVY = BUILDER
+            .comment("The gravity increase granted by the Heavy mod.")
+            .defineInRange("modHeavyEffect", 0.05, 0.01, 0.1);
+    private static final ForgeConfigSpec.DoubleValue AURIC_MOD_BARRIER = BUILDER
+            .comment("The exponent reduction granted by the Barrier mod.",
+                    "Warning - this can be immensely powerful if overtuned.")
+            .defineInRange("modBarrierEffect", 0.005, 0.001, 0.05);
+    private static final ForgeConfigSpec.DoubleValue AURIC_MOD_REJUVENATING = BUILDER
+            .comment("The bonus health granted by the Rejuvenation mod.",
+                    "One bonus heart = 2 health.")
+            .defineInRange("modRejuvenatingEffect", 2, 0.1, 10);
+    private static final ForgeConfigSpec.DoubleValue AURIC_MOD_REFOCUSED_ATTACK_SPEED = BUILDER
+            .comment("The bonus attack speed granted by the Refocused mod.")
+            .defineInRange("modRefocusedSpeedEffect", 0.05, 0.01, 1);
+    private static final ForgeConfigSpec.DoubleValue AURIC_MOD_REFOCUSED_ATTACK_STRENGTH = BUILDER
+            .comment("The bonus attack damage granted by the Refocused mod.")
+            .defineInRange("modRefocusedDamageEffect", 0.5, 0.1, 5);
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static double resonantToughness;
@@ -65,6 +109,19 @@ public class AmethystWingsConfig {
     public static double boostStrength;
     public static double elytraBoostStrength;
 
+    public static double resonantModSpatial;
+    public static double resonantModLucky;
+    public static double hardenedModWarding;
+    public static double hardenedModReinforced;
+    public static double energeticModEmpowered;
+    public static double energeticModEnhancing;
+    public static double shapedModFloaty;
+    public static double shapedModHeavy;
+    public static double auricModBarrier;
+    public static double auricModRejuvenating;
+    public static double auricModRefocusedAttackSpeed;
+    public static double auricModRefocusedAttackStrength;
+
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         resonantToughness = RESONANT_TOUGHNESS.get();
@@ -80,5 +137,19 @@ public class AmethystWingsConfig {
 
         boostStrength = BOOST_STRENGTH.get();
         elytraBoostStrength = ELYTRA_BOOST_STRENGTH.get();
+
+        // modifiers
+        resonantModSpatial = RESONANT_MOD_SPATIAL.get();
+        resonantModLucky = RESONANT_MOD_LUCKY.get();
+        hardenedModWarding = HARDENED_MOD_WARDING.get();
+        hardenedModReinforced = HARDENED_MOD_REINFORCED.get();
+        energeticModEmpowered = ENERGETIC_MOD_EMPOWERED.get();
+        energeticModEnhancing = ENERGETIC_MOD_ENHANCING.get();
+        shapedModFloaty = SHAPED_MOD_FLOATY.get();
+        shapedModHeavy = SHAPED_MOD_HEAVY.get();
+        auricModBarrier = AURIC_MOD_BARRIER.get();
+        auricModRejuvenating = AURIC_MOD_REJUVENATING.get();
+        auricModRefocusedAttackSpeed = AURIC_MOD_REFOCUSED_ATTACK_SPEED.get();
+        auricModRefocusedAttackStrength = AURIC_MOD_REFOCUSED_ATTACK_STRENGTH.get();
     }
 }

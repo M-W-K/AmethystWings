@@ -48,6 +48,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     public static final Capability<WingsCapability> WINGS_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
     private final Multimap<Attribute, AttributeModifier> attributes = HashMultimap.create(1,1);
+    private static final long UUID_GENERATION_LONG = 5922082172061207211L;
+    private double boostBonus = 1;
 
     public static final WingsCapability EMPTY = new WingsCapability();
 
@@ -168,14 +170,14 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             if (tick < data.lastBoostTick + 20) return;
             data.lastBoostTick = tick;
             WingsBoostPacket.send(mainHand);
-        } else if (!elytraBoost) EventHandler.markBoosted(entity);
+        } else if (!elytraBoost) EventHandler.markBoosted(entity, boostBonus);
 
         Vec3 deltaMovement = entity.getDeltaMovement();
         if (elytraBoost) {
             Vec3 lookAngle = entity.getLookAngle();
             entity.setDeltaMovement(deltaMovement.add(lookAngle.scale(AmethystWingsConfig.elytraBoostStrength)));
         } else {
-            entity.setDeltaMovement(deltaMovement.x(), AmethystWingsConfig.boostStrength, deltaMovement.z());
+            entity.setDeltaMovement(deltaMovement.x(), AmethystWingsConfig.boostStrength * boostBonus, deltaMovement.z());
         }
         takeBoostDamage(entity);
     }
@@ -200,7 +202,12 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         while (shieldCrystals.hasNext() && damage > 0) {
             Crystal crystal = shieldCrystals.next();
             if (guaranteedShatter > 0) {
-                crystal.shatter(owningEntity);
+                double mult = crystal.crystalItem.getShatterMult();
+                if (mult < 1) {
+                    crystal.damage(owningEntity, (int) (mult * crystal.crystalItem.getMaxDamage(crystal.crystalStack)));
+                } else {
+                    crystal.shatter(owningEntity);
+                }
                 guaranteedShatter -= crystal.crystalItem.getMass();
                 continue;
             }
@@ -536,6 +543,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
 
     private void onContentsChanged() {
         this.attributes.clear();
+        this.boostBonus = 1;
         Object2DoubleMap<Attribute> attributeAccumulation = new Object2DoubleOpenHashMap<>();
         this.crystals.clear();
         this.crystalsShieldSorted.clear();
@@ -546,6 +554,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             ItemStack stack = stacks.get(i);
             if (stack.getItem() instanceof WingsCrystalItem item) {
                 Crystal crystal = new Crystal(stack, i);
+                boostBonus += item.getBoostBonus();
                 for (var entry : item.getAttributeContributions().object2DoubleEntrySet()) {
                     attributeAccumulation.mergeDouble(entry.getKey(), entry.getDoubleValue(), Double::sum);
                 }
@@ -562,7 +571,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.crystalsBoostSorted.sort();
         if (!attributeAccumulation.isEmpty()) {
             for (var entry : attributeAccumulation.object2DoubleEntrySet()) {
-                this.attributes.put(entry.getKey(), new AttributeModifier("Crystal " + entry.getKey().getDescriptionId(), entry.getDoubleValue(), AttributeModifier.Operation.ADDITION));
+                UUID attribute_uuid = new UUID(UUID_GENERATION_LONG, UUID_GENERATION_LONG ^ entry.getKey().getDescriptionId().hashCode());
+                this.attributes.put(entry.getKey(), new AttributeModifier(attribute_uuid, "Crystal " + entry.getKey().getDescriptionId(), entry.getDoubleValue(), AttributeModifier.Operation.ADDITION));
             }
         }
         initActiveLists();
@@ -600,7 +610,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         boolean crystalDamaged = this.crystalDamaged;
         this.crystalDamaged = false;
 
-        if (shatteredCrystals.size() == 0) {
+        if (shatteredCrystals.isEmpty()) {
             if (crystalDamaged && doSounds) {
                 Vec3 pos = owningEntity.position();
                 // TODO localize sounds to crystal locations rather than player location?

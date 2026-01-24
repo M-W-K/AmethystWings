@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
+import com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -86,13 +88,33 @@ public final class EventHandler {
         }
     }
 
-    public static void markBoosted(@NotNull LivingEntity entity) {
+    public static void markBoosted(@NotNull LivingEntity entity, double bonus) {
         if (entity.getServer() == null) return;
         BOOSTED_ENTITIES.put(entity.getUUID(), entity.getY());
-        BOOSTED_ENTITIES_DECAY_TIMES.put(entity.getUUID(), entity.getServer().getTickCount() + computeDecayTime());
+        BOOSTED_ENTITIES_DECAY_TIMES.put(entity.getUUID(), entity.getServer().getTickCount() + computeDecayTime(bonus));
     }
 
-    private static int computeDecayTime() {
-        return (int) (AmethystWingsConfig.boostStrength * AmethystWingsConfig.boostStrength * 600);
+    private static int computeDecayTime(double bonus) {
+        return (int) (AmethystWingsConfig.boostStrength * AmethystWingsConfig.boostStrength * bonus * bonus * 600);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void applyAttributesToDamage(@NotNull LivingHurtEvent event) {
+        double amount = event.getAmount();
+        if (event.isCanceled() || amount <= 1) return;
+        LivingEntity receiver = event.getEntity();
+        // apply warding
+        // block things that armor can block, and magic-type damage that witches can resist.
+        if (!event.getSource().is(DamageTypeTags.BYPASSES_ARMOR) || event.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO)) {
+            double reduction = receiver.getAttributeValue(AmethystWingsAttributeRegistry.WARDING.get());
+            amount = Math.max(amount - reduction, 1);
+        }
+        // apply barrier
+        // blocks everything that doesn't bypass invulnerability
+        if (!event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            double barrier = receiver.getAttributeValue(AmethystWingsAttributeRegistry.BARRIER.get());
+            amount = Math.pow(amount, 1 - barrier);
+        }
+        event.setAmount((float) amount);
     }
 }

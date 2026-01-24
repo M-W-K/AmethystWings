@@ -125,7 +125,7 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         WingsCapability cap = getCapability(stack);
-        if (slot == EquipmentSlot.OFFHAND) {
+        if (slot.getType() == EquipmentSlot.Type.HAND) {
             return cap.getAttributes();
         }
         return super.getAttributeModifiers(slot, stack);
