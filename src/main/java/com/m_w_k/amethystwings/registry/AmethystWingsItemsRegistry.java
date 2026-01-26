@@ -124,7 +124,7 @@ public class AmethystWingsItemsRegistry {
             ret.put(Attributes.ATTACK_DAMAGE, AmethystWingsConfig.auricModRefocusedAttackStrength);
         } else {
             ret.put(Attributes.ARMOR_TOUGHNESS, AmethystWingsConfig.auricToughness);
-            ret.put(Attributes.KNOCKBACK_RESISTANCE, 0.05);
+            ret.put(Attributes.KNOCKBACK_RESISTANCE, 0.1);
         }
         if (variant == 1) {
             ret.put(AmethystWingsAttributeRegistry.BARRIER.get(), AmethystWingsConfig.auricModBarrier);

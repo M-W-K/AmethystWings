@@ -5,6 +5,7 @@
 
   "item.amethystwings.wings_controller":"Amethyst Wings Controller",
   "item.amethystwings.wings_controller.tooltip":"Right click to open crystal container",
+  "item.amethystwings.wings_controller.tooltip2":"Attribute bonuses suffer diminishing returns",
   "item.amethystwings.treated_amethyst":"Treated Amethyst Shard",
   "item.amethystwings.resonant_amethyst":"Resonant Amethyst Crystal",
   "item.amethystwings.resonant_amethyst.sturdy":"Sturdy Resonant Amethyst Crystal",

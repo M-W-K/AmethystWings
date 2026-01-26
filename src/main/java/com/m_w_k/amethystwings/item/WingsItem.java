@@ -91,6 +91,7 @@ public class WingsItem extends Item implements Equipable {
     @Override
     public void appendHoverText(@NotNull ItemStack p_41421_, @Nullable Level p_41422_, @NotNull List<Component> list, @NotNull TooltipFlag p_41424_) {
         list.add(Component.translatable("item.amethystwings.wings_controller.tooltip").withStyle(ChatFormatting.GOLD));
+        list.add(Component.translatable("item.amethystwings.wings_controller.tooltip2").withStyle(ChatFormatting.GRAY));
     }
 
     @Override

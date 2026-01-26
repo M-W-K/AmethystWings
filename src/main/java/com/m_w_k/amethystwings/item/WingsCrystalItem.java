@@ -1,6 +1,7 @@
 package com.m_w_k.amethystwings.item;
 
 import com.m_w_k.amethystwings.CrystalStats;
+import com.m_w_k.amethystwings.api.AttributeBehaviors;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
@@ -81,16 +82,18 @@ public class WingsCrystalItem extends Item {
                 components.add(Component.translatable("item.amethystwings.wings_controller.attribute").withStyle(ChatFormatting.GRAY));
 
                 for (var entry : contributions.object2DoubleEntrySet()) {
+                    AttributeModifier.Operation op = AttributeBehaviors.getType(entry.getKey());
                     double d0 = entry.getDoubleValue();
                     if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
                         d0 *= 10.0D;
+                    } else if (op != AttributeModifier.Operation.ADDITION) {
+                        d0 *= 100;
                     }
 
                     if (d0 > 0.0D) {
-                        components.add(Component.translatable("attribute.modifier.plus." + AttributeModifier.Operation.ADDITION.toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d0), Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.BLUE));
+                        components.add(Component.translatable("attribute.modifier.plus." + op.toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d0), Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.BLUE));
                     } else if (d0 < 0.0D) {
-                        d0 *= -1.0D;
-                        components.add(Component.translatable("attribute.modifier.take." + AttributeModifier.Operation.ADDITION.toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d0), Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.RED));
+                        components.add(Component.translatable("attribute.modifier.take." + op.toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(-d0), Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.RED));
                     }
                 }
             }

@@ -4,14 +4,16 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.m_w_k.amethystwings.AmethystWingsConfig;
 import com.m_w_k.amethystwings.EventHandler;
+import com.m_w_k.amethystwings.api.AttributeBehaviors;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.network.CrystalParticlePacket;
 import com.m_w_k.amethystwings.network.WingsBoostPacket;
 import com.m_w_k.amethystwings.registry.AmethystWingsSoundsRegistry;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -544,7 +546,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private void onContentsChanged() {
         this.attributes.clear();
         this.boostBonus = 1;
-        Object2DoubleMap<Attribute> attributeAccumulation = new Object2DoubleOpenHashMap<>();
+        Object2ObjectOpenHashMap<Attribute, DoubleList> attributeAccumulation = new Object2ObjectOpenHashMap<>();
+        DoubleList boostBonus = new DoubleArrayList();
         this.crystals.clear();
         this.crystalsShieldSorted.clear();
         this.crystalsElytraSorted.clear();
@@ -554,9 +557,10 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             ItemStack stack = stacks.get(i);
             if (stack.getItem() instanceof WingsCrystalItem item) {
                 Crystal crystal = new Crystal(stack, i);
-                boostBonus += item.getBoostBonus();
+                boostBonus.add(item.getBoostBonus());
                 for (var entry : item.getAttributeContributions().object2DoubleEntrySet()) {
-                    attributeAccumulation.mergeDouble(entry.getKey(), entry.getDoubleValue(), Double::sum);
+                    attributeAccumulation.computeIfAbsent(entry.getKey(), k -> new DoubleArrayList())
+                            .add(entry.getDoubleValue());
                 }
                 this.crystals.add(crystal);
                 if (item.supportsActions()) {
@@ -570,12 +574,22 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.crystalsElytraSorted.sort();
         this.crystalsBoostSorted.sort();
         if (!attributeAccumulation.isEmpty()) {
-            for (var entry : attributeAccumulation.object2DoubleEntrySet()) {
+            for (var entry : attributeAccumulation.object2ObjectEntrySet()) {
                 UUID attribute_uuid = new UUID(UUID_GENERATION_LONG, UUID_GENERATION_LONG ^ entry.getKey().getDescriptionId().hashCode());
-                this.attributes.put(entry.getKey(), new AttributeModifier(attribute_uuid, "Crystal " + entry.getKey().getDescriptionId(), entry.getDoubleValue(), AttributeModifier.Operation.ADDITION));
+                this.attributes.put(entry.getKey(), new AttributeModifier(attribute_uuid, "Crystal " + entry.getKey().getDescriptionId(), attributeSoftCap(entry.getValue()), AttributeBehaviors.getType(entry.getKey())));
             }
         }
+        this.boostBonus += attributeSoftCap(boostBonus);
         initActiveLists();
+    }
+
+    protected double attributeSoftCap(DoubleList attributeContributions) {
+        double sum = 0;
+        double p = Math.pow(AmethystWingsConfig.attributeSoftCapFactor, 1 - 1d / attributeContributions.size());
+        for (double d : attributeContributions) {
+            sum += Math.signum(d) * Math.pow(Math.abs(d), p);
+        }
+        return Math.signum(sum) * Math.pow(Math.abs(sum), 1 / p);
     }
 
     /**
