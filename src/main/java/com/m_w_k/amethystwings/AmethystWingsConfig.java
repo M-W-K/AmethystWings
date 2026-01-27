@@ -11,7 +11,7 @@ public class AmethystWingsConfig {
 
     private static final ForgeConfigSpec.DoubleValue RESONANT_TOUGHNESS = BUILDER
             .comment("Toughness gained per slotted resonant crystal")
-            .defineInRange("resonantToughness", 0.5d, 0d, 10d);
+            .defineInRange("resonantToughness", 0.2d, 0d, 10d);
 
     private static final ForgeConfigSpec.DoubleValue AURIC_TOUGHNESS = BUILDER
             .comment("Toughness gained per slotted auric crystal")
@@ -51,13 +51,13 @@ public class AmethystWingsConfig {
 
     private static final ForgeConfigSpec.DoubleValue ATTRIBUTE_SOFT_CAP_FACTOR = BUILDER
             .comment("The strength of the soft cap for attribute bonuses.")
-            .defineInRange("attributeSoftCapFactor", 2d, 1, 10);
+            .defineInRange("attributeSoftCapFactor", 1.5d, 1, 10);
 
     private static final ForgeConfigSpec.Builder MODIFIERS = BUILDER.push("Modifiers");
 
     private static final ForgeConfigSpec.DoubleValue RESONANT_MOD_SPATIAL = BUILDER
             .comment("The reach distance granted by the Spatial mod.")
-            .defineInRange("modSpatialEffect", 0.7, 0.1, 5);
+            .defineInRange("modSpatialEffect", 0.2, 0.1, 5);
     private static final ForgeConfigSpec.DoubleValue RESONANT_MOD_LUCKY = BUILDER
             .comment("The luck granted by the Lucky mod.")
             .defineInRange("modLuckyEffect", 0.2, 0.01, 2);
@@ -65,17 +65,17 @@ public class AmethystWingsConfig {
             .comment("The flat damage reduction granted by the Warding mod.",
                     "Damage reduction applies to anything blocked by armor or classified as magic.",
                     "Cannot reduce incoming damage below 1, and applies before other sources of damage reduction.")
-            .defineInRange("modWardingEffect", 0.5, 0.1, 5);
+            .defineInRange("modWardingEffect", 0.4, 0.1, 5);
     private static final ForgeConfigSpec.DoubleValue HARDENED_MOD_REINFORCED = BUILDER
             .comment("The shatter multiplier granted by the Reinforced mod.",
                     "Crystal durability will be reduced by its max durability times this value when hit by an axe.")
             .defineInRange("modReinforcedEffect", 0.5, 0.1, 1);
     private static final ForgeConfigSpec.DoubleValue ENERGETIC_MOD_EMPOWERED = BUILDER
             .comment("The boost power increase granted by the Empowered mod.")
-            .defineInRange("modEmpoweredEffect", 0.05, 0.01, 0.5);
+            .defineInRange("modEmpoweredEffect", 0.03, 0.01, 0.5);
     private static final ForgeConfigSpec.DoubleValue ENERGETIC_MOD_ENHANCING = BUILDER
             .comment("The speed and swim boost granted by the Enhancing mod.")
-            .defineInRange("modEnhancingEffect", 0.1, 0.01, 0.5);
+            .defineInRange("modEnhancingEffect", 0.05, 0.01, 0.5);
     private static final ForgeConfigSpec.DoubleValue SHAPED_MOD_FLOATY = BUILDER
             .comment("The gravity decrease granted by the Floaty mod.")
             .defineInRange("modFloatyEffect", 0.1, 0.01, 1);
@@ -85,11 +85,11 @@ public class AmethystWingsConfig {
     private static final ForgeConfigSpec.DoubleValue AURIC_MOD_BARRIER = BUILDER
             .comment("The exponent reduction granted by the Barrier mod.",
                     "Warning - this can be immensely powerful if overtuned.")
-            .defineInRange("modBarrierEffect", 0.05, 0.001, 0.5);
+            .defineInRange("modBarrierEffect", 0.03, 0.001, 0.5);
     private static final ForgeConfigSpec.DoubleValue AURIC_MOD_REJUVENATING = BUILDER
             .comment("The bonus health granted by the Rejuvenation mod.",
                     "One bonus heart = 2 health.")
-            .defineInRange("modRejuvenatingEffect", 3, 0.1, 10);
+            .defineInRange("modRejuvenatingEffect", 2, 0.1, 10);
     private static final ForgeConfigSpec.DoubleValue AURIC_MOD_REFOCUSED_ATTACK_SPEED = BUILDER
             .comment("The bonus attack speed granted by the Refocused mod.")
             .defineInRange("modRefocusedSpeedEffect", 0.1, 0.01, 1);
@@ -178,8 +178,8 @@ public class AmethystWingsConfig {
 
     private static boolean v1() {
         if (CONFIG_VERSION.get() < 1) {
-            RESONANT_TOUGHNESS.set(0.5);
-            AURIC_TOUGHNESS.set(2D);
+            RESONANT_TOUGHNESS.set(0.2);
+            AURIC_TOUGHNESS.set(1D);
             return true;
         }
         return false;
