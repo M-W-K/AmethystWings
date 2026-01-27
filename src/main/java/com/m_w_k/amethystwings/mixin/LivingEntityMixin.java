@@ -34,16 +34,13 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow public abstract boolean hasEffect(MobEffect p_21024_);
 
-    @ModifyVariable(method = "updateFallFlying", at = @At(value = "JUMP", opcode = Opcodes.IFNE, ordinal = 3))
+    @ModifyVariable(method = "updateFallFlying", at = @At(value = "STORE", ordinal = 1))
     private boolean extendedElytraCheck(boolean flag) {
         if (flag) return true;
-        boolean canFly = !this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION);
-        if (this.getSharedFlag(7) && canFly) {
-            flag = amethystWings$tryExtendedCheck(EquipmentSlot.MAINHAND);
-            if (!flag) flag = amethystWings$tryExtendedCheck(EquipmentSlot.OFFHAND);
-        }
+        flag = amethystWings$tryExtendedCheck(EquipmentSlot.MAINHAND);
+        if (!flag) flag = amethystWings$tryExtendedCheck(EquipmentSlot.OFFHAND);
         // failsafe -- when player is fallflying with both elytra and wings, it doesn't stop when it should.
-        if (!canFly && ((Object) this) instanceof Player player) player.stopFallFlying();
+//        if (!canFly && ((Object) this) instanceof Player player) player.stopFallFlying();
         return flag;
     }
 
