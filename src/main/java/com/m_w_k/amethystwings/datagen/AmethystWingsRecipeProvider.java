@@ -68,17 +68,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.STURDY_HARDENED_AMETHYST.get())
-                .requires(AmethystWingsTags.HARDENED_CRYSTAL).requires(Tags.Items.INGOTS_COPPER)
+                .requires(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()).requires(Tags.Items.INGOTS_COPPER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.WARDING_HARDENED_AMETHYST.get())
-                .requires(AmethystWingsTags.HARDENED_CRYSTAL).requires(Items.DIAMOND)
+                .requires(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()).requires(Items.DIAMOND)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.REINFORCED_HARDENED_AMETHYST.get())
-                .requires(AmethystWingsTags.HARDENED_CRYSTAL).requires(Items.CHAIN)
+                .requires(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()).requires(Items.CHAIN)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.HARDENED_AMETHYST.get()))
                 .save(writer);
     }
@@ -91,17 +91,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.STURDY_SHAPED_AMETHYST.get())
-                .requires(AmethystWingsTags.SHAPED_CRYSTAL).requires(Tags.Items.INGOTS_COPPER)
+                .requires(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()).requires(Tags.Items.INGOTS_COPPER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.FLOATY_SHAPED_AMETHYST.get())
-                .requires(AmethystWingsTags.SHAPED_CRYSTAL).requires(Tags.Items.FEATHERS)
+                .requires(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()).requires(Tags.Items.FEATHERS)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.HEAVY_SHAPED_AMETHYST.get())
-                .requires(AmethystWingsTags.SHAPED_CRYSTAL).requires(Tags.Items.STONE)
+                .requires(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()).requires(Tags.Items.STONE)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.SHAPED_AMETHYST.get()))
                 .save(writer);
     }
@@ -114,17 +114,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.STURDY_ENERGETIC_AMETHYST.get())
-                .requires(AmethystWingsTags.ENERGETIC_CRYSTAL).requires(Tags.Items.INGOTS_COPPER)
+                .requires(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()).requires(Tags.Items.INGOTS_COPPER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.EMPOWERED_ENERGETIC_AMETHYST.get())
-                .requires(AmethystWingsTags.ENERGETIC_CRYSTAL).requires(Items.BLAZE_POWDER)
+                .requires(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()).requires(Items.BLAZE_POWDER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.ENHANCING_ENERGETIC_AMETHYST.get())
-                .requires(AmethystWingsTags.ENERGETIC_CRYSTAL).requires(Items.SUGAR)
+                .requires(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()).requires(Items.SUGAR)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.ENERGETIC_AMETHYST.get()))
                 .save(writer);
     }
@@ -137,17 +137,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.BARRIER_AURIC_AMETHYST.get())
-                .requires(AmethystWingsTags.AURIC_CRYSTAL).requires(Items.END_CRYSTAL)
+                .requires(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()).requires(Items.END_CRYSTAL)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.REJUVENATING_AURIC_AMETHYST.get())
-                .requires(AmethystWingsTags.AURIC_CRYSTAL).requires(Items.GOLDEN_APPLE)
+                .requires(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()).requires(Items.GOLDEN_APPLE)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.REFOCUSED_AURIC_AMETHYST.get())
-                .requires(AmethystWingsTags.AURIC_CRYSTAL).requires(Items.DRAGON_BREATH)
+                .requires(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()).requires(Items.DRAGON_BREATH)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()))
                 .save(writer);
     }
@@ -160,17 +160,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.VENGEFUL_TOTEMIC_AMETHYST.get())
-                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.WITHER_ROSE)
+                .requires(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()).requires(Items.WITHER_ROSE)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.MERCIFUL_TOTEMIC_AMETHYST.get())
-                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.DIAMOND)
+                .requires(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()).requires(Items.DIAMOND)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.NOURISHING_TOTEMIC_AMETHYST.get())
-                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.GOLDEN_CARROT)
+                .requires(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()).requires(Items.GOLDEN_CARROT)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
                 .save(writer);
     }

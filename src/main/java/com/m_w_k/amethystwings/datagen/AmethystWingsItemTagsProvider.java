@@ -45,7 +45,10 @@ public class AmethystWingsItemTagsProvider extends ItemTagsProvider {
                 .add(AmethystWingsItemsRegistry.REJUVENATING_AURIC_AMETHYST.get())
                 .add(AmethystWingsItemsRegistry.REFOCUSED_AURIC_AMETHYST.get());
         tag(AmethystWingsTags.TOTEMIC_CRYSTAL)
-                .add(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get());
+                .add(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get())
+                .add(AmethystWingsItemsRegistry.VENGEFUL_TOTEMIC_AMETHYST.get())
+                .add(AmethystWingsItemsRegistry.MERCIFUL_TOTEMIC_AMETHYST.get())
+                .add(AmethystWingsItemsRegistry.NOURISHING_TOTEMIC_AMETHYST.get());
 
         tag(AmethystWingsTags.FUNCTIONAL_CRYSTAL).addTags(AmethystWingsTags.AURIC_CRYSTAL,
                 AmethystWingsTags.ENERGETIC_CRYSTAL, AmethystWingsTags.HARDENED_CRYSTAL,
