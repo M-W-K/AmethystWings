@@ -19,6 +19,7 @@ public class AmethystWingsModelProvider extends ItemModelProvider {
     public static final ResourceLocation ENERGETIC = rl("entity/energetic_crystal");
     public static final ResourceLocation SHAPED = rl("entity/shaped_crystal");
     public static final ResourceLocation AURIC = rl("entity/auric_crystal");
+    public static final ResourceLocation TOTEMIC = rl("entity/totemic_crystal");
 
     public AmethystWingsModelProvider(PackOutput p_252226_, ExistingFileHelper helper) {
         super(p_252226_, MODID, helper);
@@ -60,6 +61,12 @@ public class AmethystWingsModelProvider extends ItemModelProvider {
         modifiedCrystal(crystal, AmethystWingsItemsRegistry.REJUVENATING_AURIC_AMETHYST.get(), "rejuvenating");
         modifiedCrystal(crystal, AmethystWingsItemsRegistry.REFOCUSED_AURIC_AMETHYST.get(), "refocused");
 
+        crystal = AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get();
+        basicItem(crystal);
+        modifiedCrystal(crystal, AmethystWingsItemsRegistry.VENGEFUL_TOTEMIC_AMETHYST.get(), "vengeful");
+        modifiedCrystal(crystal, AmethystWingsItemsRegistry.MERCIFUL_TOTEMIC_AMETHYST.get(), "merciful");
+        modifiedCrystal(crystal, AmethystWingsItemsRegistry.NOURISHING_TOTEMIC_AMETHYST.get(), "nourishing");
+
         basicItem(AmethystWingsItemsRegistry.TREATED_AMETHYST.get());
 
         crystalModel(RESONANT, rl("block/resonant_crystal"));
@@ -67,6 +74,7 @@ public class AmethystWingsModelProvider extends ItemModelProvider {
         crystalModel(ENERGETIC, rl("block/energetic_crystal"));
         crystalModel(SHAPED, rl("block/shaped_crystal"));
         crystalModel(AURIC, rl("block/auric_crystal"));
+        crystalModel(TOTEMIC, rl("block/totemic_crystal"));
     }
 
     private void modifiedCrystal(Item base, Item mod, String modName) {

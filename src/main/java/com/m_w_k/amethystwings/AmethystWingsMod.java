@@ -62,5 +62,6 @@ public class AmethystWingsMod {
         event.register(AmethystWingsModelProvider.ENERGETIC);
         event.register(AmethystWingsModelProvider.SHAPED);
         event.register(AmethystWingsModelProvider.AURIC);
+        event.register(AmethystWingsModelProvider.TOTEMIC);
     }
 }

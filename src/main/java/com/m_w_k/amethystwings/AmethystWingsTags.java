@@ -13,6 +13,7 @@ public class AmethystWingsTags {
     public static final TagKey<Item> ENERGETIC_CRYSTAL = bind("energetic_crystal");
     public static final TagKey<Item> SHAPED_CRYSTAL = bind("shaped_crystal");
     public static final TagKey<Item> AURIC_CRYSTAL = bind("auric_crystal");
+    public static final TagKey<Item> TOTEMIC_CRYSTAL = bind("totemic_crystal");
 
 
     private static TagKey<Item> bind(String name) {

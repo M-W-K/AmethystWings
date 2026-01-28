@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings.registry;
 
 import com.m_w_k.amethystwings.AmethystWingsConfig;
 import com.m_w_k.amethystwings.CrystalStats;
+import com.m_w_k.amethystwings.api.TotemBehavior;
 import com.m_w_k.amethystwings.item.WingsCrystalItem;
 import com.m_w_k.amethystwings.item.WingsItem;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
@@ -73,7 +74,14 @@ public class AmethystWingsItemsRegistry {
     public static final RegistryObject<Item> REFOCUSED_AURIC_AMETHYST = ITEMS.register("auric_amethyst.refocused",
             () -> new WingsCrystalItem(new Item.Properties().fireResistant(), new CrystalStats(AURIC).attributeContributions(() -> auricAttribute(3))));
 
-    // add totemic crystal, 5 crystals per totem, consumes 4 crystals to save you from death
+    public static final RegistryObject<Item> TOTEMIC_AMETHYST = ITEMS.register("totemic_amethyst",
+            () -> new WingsCrystalItem(new Item.Properties(), new CrystalStats(TOTEMIC).special(TotemBehavior.IDENTIFIER, TotemBehavior.NORMAL)));
+    public static final RegistryObject<Item> VENGEFUL_TOTEMIC_AMETHYST = ITEMS.register("totemic_amethyst.vengeful",
+            () -> new WingsCrystalItem(new Item.Properties(), new CrystalStats(TOTEMIC).special(TotemBehavior.IDENTIFIER, TotemBehavior.VENGEFUL)));
+    public static final RegistryObject<Item> MERCIFUL_TOTEMIC_AMETHYST = ITEMS.register("totemic_amethyst.merciful",
+            () -> new WingsCrystalItem(new Item.Properties(), new CrystalStats(TOTEMIC).special(TotemBehavior.IDENTIFIER, TotemBehavior.MERCIFUL)));
+    public static final RegistryObject<Item> NOURISHING_TOTEMIC_AMETHYST = ITEMS.register("totemic_amethyst.nourishing",
+            () -> new WingsCrystalItem(new Item.Properties(), new CrystalStats(TOTEMIC).special(TotemBehavior.NOURISHING, null)));
 
     private static Item.Properties crystalProps(int durability) {
         return new Item.Properties().durability(durability);

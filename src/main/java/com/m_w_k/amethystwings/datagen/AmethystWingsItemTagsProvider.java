@@ -44,9 +44,12 @@ public class AmethystWingsItemTagsProvider extends ItemTagsProvider {
                 .add(AmethystWingsItemsRegistry.BARRIER_AURIC_AMETHYST.get())
                 .add(AmethystWingsItemsRegistry.REJUVENATING_AURIC_AMETHYST.get())
                 .add(AmethystWingsItemsRegistry.REFOCUSED_AURIC_AMETHYST.get());
+        tag(AmethystWingsTags.TOTEMIC_CRYSTAL)
+                .add(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get());
 
         tag(AmethystWingsTags.FUNCTIONAL_CRYSTAL).addTags(AmethystWingsTags.AURIC_CRYSTAL,
                 AmethystWingsTags.ENERGETIC_CRYSTAL, AmethystWingsTags.HARDENED_CRYSTAL,
-                AmethystWingsTags.RESONANT_CRYSTAL, AmethystWingsTags.SHAPED_CRYSTAL);
+                AmethystWingsTags.RESONANT_CRYSTAL, AmethystWingsTags.SHAPED_CRYSTAL,
+                AmethystWingsTags.TOTEMIC_CRYSTAL);
     }
 }

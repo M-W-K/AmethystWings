@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,7 @@ public final class CrystalStats {
     private IntSupplier mass;
     private DoubleSupplier shatterMult;
     private DoubleSupplier boostBonus;
+    private Object2ObjectOpenHashMap<String, Object> special;
 
     public CrystalStats(@NotNull ResourceLocation wingsModelLoc) {
         this.wingsModelLoc = wingsModelLoc;
@@ -82,6 +84,12 @@ public final class CrystalStats {
         return this;
     }
 
+    public CrystalStats special(String identifier, Object data) {
+        if (special == null) special = new Object2ObjectOpenHashMap<>();
+        special.put(identifier, data);
+        return this;
+    }
+
     public @NotNull ResourceLocation getWingsModelLoc() {
         return wingsModelLoc;
     }
@@ -108,5 +116,9 @@ public final class CrystalStats {
 
     public DoubleSupplier getBoostBonus() {
         return boostBonus;
+    }
+
+    public Object2ObjectOpenHashMap<String, Object> getSpecial() {
+        return special;
     }
 }

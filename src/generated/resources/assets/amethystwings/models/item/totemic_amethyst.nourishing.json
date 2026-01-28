@@ -1,0 +1,6 @@
+{
+  "parent": "amethystwings:item/totemic_amethyst",
+  "textures": {
+    "layer1": "amethystwings:item/modifier/nourishing"
+  }
+}

@@ -86,6 +86,8 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
     private final List<Crystal> crystals = new ObjectArrayList<>();
     private final List<Crystal> shatteredCrystals = new ObjectArrayList<>();
 
+    private final Multimap<String, Crystal> specialCrystals = HashMultimap.create(1, 1);
+
     private WingsCapability() {
         this.stack = null;
         this.dataKey = WingsCapDataCache.DataKey.of(0);
@@ -552,6 +554,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         this.crystalsShieldSorted.clear();
         this.crystalsElytraSorted.clear();
         this.crystalsBoostSorted.clear();
+        this.specialCrystals.clear();
         NonNullList<ItemStack> stacks = getItemList();
         for (int i = 0; i < 54; i++) {
             ItemStack stack = stacks.get(i);
@@ -567,6 +570,9 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
                     if (item.isActionSupported(WingsAction.SHIELD)) this.crystalsShieldSorted.add(crystal);
                     if (item.isActionSupported(WingsAction.ELYTRA)) this.crystalsElytraSorted.add(crystal);
                     if (item.isActionSupported(WingsAction.BOOST)) this.crystalsBoostSorted.add(crystal);
+                }
+                for (String special : item.getSpecials()) {
+                    this.specialCrystals.put(special, crystal);
                 }
             }
         }
@@ -616,10 +622,14 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
         return this.crystals.stream().filter(crystal -> crystal.slot == slot).findFirst().orElse(null);
     }
 
+    public Collection<Crystal> getSpecialCrystals(String identifier) {
+        return specialCrystals.get(identifier);
+    }
+
     /**
      * Should always be called after crystals are damaged for any reason.
      */
-    private void handleShatteredCrystals(@Nullable LivingEntity owningEntity) {
+    public void handleShatteredCrystals(@Nullable LivingEntity owningEntity) {
         boolean doSounds = owningEntity != null && !owningEntity.level().isClientSide();
         boolean crystalDamaged = this.crystalDamaged;
         this.crystalDamaged = false;
@@ -628,6 +638,7 @@ public class WingsCapability implements IItemHandlerModifiable, ICapabilityProvi
             if (crystalDamaged && doSounds) {
                 Vec3 pos = owningEntity.position();
                 // TODO localize sounds to crystal locations rather than player location?
+                // would require rendering information to do, so firing the sound would need to be handled on each client individually
                 owningEntity.level().playSound(null, pos.x() + 0.5, pos.y() + 0.5, pos.z() + 0.5,
                         AmethystWingsSoundsRegistry.CRYSTAL_DAMAGE.get(), SoundSource.BLOCKS, 0.2f, 2f);
             }

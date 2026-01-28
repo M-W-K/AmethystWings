@@ -5,6 +5,7 @@ import com.m_w_k.amethystwings.api.AttributeBehaviors;
 import com.m_w_k.amethystwings.api.util.WingsAction;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -20,8 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -34,6 +37,7 @@ public class WingsCrystalItem extends Item {
     private final @Nullable IntSupplier mass;
     private final @Nullable DoubleSupplier shatterMult;
     private final @Nullable DoubleSupplier boostBonus;
+    private final @Nullable Object2ObjectOpenHashMap<String, Object> special;
 
     public WingsCrystalItem(Item.Properties properties, CrystalStats stats) {
         super(properties);
@@ -44,6 +48,7 @@ public class WingsCrystalItem extends Item {
         this.mass = stats.getMass();
         this.shatterMult = stats.getShatterMult();
         this.boostBonus = stats.getBoostBonus();
+        this.special = stats.getSpecial();
     }
 
     @Override
@@ -122,6 +127,16 @@ public class WingsCrystalItem extends Item {
     public @NotNull Object2DoubleMap<Attribute> getAttributeContributions() {
         if (attributeContributions == null) return Object2DoubleMaps.emptyMap();
         return attributeContributions.get();
+    }
+
+    public @NotNull Set<String> getSpecials() {
+        if (special == null) return Collections.emptySet();
+        return special.keySet();
+    }
+
+    public @Nullable Object getSpecial(@NotNull String identifier) {
+        if (special == null) return null;
+        return special.get(identifier);
     }
 
     @Override

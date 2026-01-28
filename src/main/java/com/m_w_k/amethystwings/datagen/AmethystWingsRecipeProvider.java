@@ -35,6 +35,7 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
         shaped(writer);
         energetic(writer);
         auric(writer);
+        totemic(writer);
     }
 
     private void resonant(@NotNull Consumer<FinishedRecipe> writer) {
@@ -148,6 +149,29 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.REFOCUSED_AURIC_AMETHYST.get())
                 .requires(AmethystWingsTags.AURIC_CRYSTAL).requires(Items.DRAGON_BREATH)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.AURIC_AMETHYST.get()))
+                .save(writer);
+    }
+
+    private void totemic(@NotNull Consumer<FinishedRecipe> writer) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get(), 5)
+                .requires(Items.ENDER_PEARL, 4).requires(AmethystWingsItemsRegistry.TREATED_AMETHYST.get(), 4)
+                .requires(Items.TOTEM_OF_UNDYING)
+                .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TREATED_AMETHYST.get()))
+                .save(writer);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.VENGEFUL_TOTEMIC_AMETHYST.get())
+                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.WITHER_ROSE)
+                .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
+                .save(writer);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.MERCIFUL_TOTEMIC_AMETHYST.get())
+                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.DIAMOND)
+                .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
+                .save(writer);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.NOURISHING_TOTEMIC_AMETHYST.get())
+                .requires(AmethystWingsTags.TOTEMIC_CRYSTAL).requires(Items.GOLDEN_CARROT)
+                .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.TOTEMIC_AMETHYST.get()))
                 .save(writer);
     }
 }

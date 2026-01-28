@@ -1,9 +1,10 @@
-// 1.20.1	2026-01-24T14:10:38.074782	Item Models: amethystwings
+// 1.20.1	2026-01-28T09:52:22.603423	Item Models: amethystwings
 afe33470394890069fac34519a737d27ed03c6d4 assets/amethystwings/models/entity/auric_crystal.json
 c83ef7b5c603249b7dacbbe18e513f0c9b792851 assets/amethystwings/models/entity/energetic_crystal.json
 abf1f5de82c467c06bd25ef521aa4b7c4e1d1f53 assets/amethystwings/models/entity/hardened_crystal.json
 cb223eb758d9a44ea0fed00cdd64652c17b2c0e4 assets/amethystwings/models/entity/resonant_crystal.json
 7c5216474e90349e5f63945bf5060b30f3e1e224 assets/amethystwings/models/entity/shaped_crystal.json
+da119bb4489acd1ef8b7aca7bb07d4e371c75f1b assets/amethystwings/models/entity/totemic_crystal.json
 18ac62e319dc8e1977082a39182e74a37c50140d assets/amethystwings/models/item/auric_amethyst.barrier.json
 0d85bc8eee90e85b16311a9eea231fd2dc2827ea assets/amethystwings/models/item/auric_amethyst.json
 ba410b74730b359bec9d92b8d41bd3f777a1f9fd assets/amethystwings/models/item/auric_amethyst.refocused.json
@@ -24,4 +25,8 @@ d5925c11fe97fea39fa7dc8d1d6e400b067a67d4 assets/amethystwings/models/item/resona
 09576d87a18f81cb384f602c8ff8f74937974b4f assets/amethystwings/models/item/shaped_amethyst.heavy.json
 90f16bdb6b53a204a2561ddd9ff02d50217293b6 assets/amethystwings/models/item/shaped_amethyst.json
 1e1568f0d6a59a48f875b9c80ae29c42e2fef009 assets/amethystwings/models/item/shaped_amethyst.sturdy.json
+87b0b3c26fd9fc70b8d6eb065a1064756f68e334 assets/amethystwings/models/item/totemic_amethyst.json
+ae88810dfd0859b197e4b5544d849a5f5649b931 assets/amethystwings/models/item/totemic_amethyst.merciful.json
+567cf841ff8b77781429feb5c7c3a35b9aebda15 assets/amethystwings/models/item/totemic_amethyst.nourishing.json
+d8079d8e3d19a9d6e68bd54f87116aefadeacae9 assets/amethystwings/models/item/totemic_amethyst.vengeful.json
 ccb19093c9a013e660033192a4afe8f5aebcac51 assets/amethystwings/models/item/treated_amethyst.json

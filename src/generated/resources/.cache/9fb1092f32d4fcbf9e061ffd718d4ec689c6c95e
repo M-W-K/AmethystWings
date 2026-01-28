@@ -1,4 +1,4 @@
-// 1.20.1	2026-01-24T15:40:33.578433	Recipes
+// 1.20.1	2026-01-28T09:52:22.60585	Recipes
 703a660bf9f3d4c797663fded6b7d81223b14880 data/amethystwings/advancements/recipes/misc/auric_amethyst.barrier.json
 a6e850a4a233da4b788a29311a861d7b6cf31aa1 data/amethystwings/advancements/recipes/misc/auric_amethyst.json
 2585f62c57b596432bbe6f7726705f85f3febdd8 data/amethystwings/advancements/recipes/misc/auric_amethyst.refocused.json
@@ -19,6 +19,10 @@ e7bb7ecd8be78fc0556c92ec177be6b8aed0f998 data/amethystwings/advancements/recipes
 a0af4538110d746ab969460abe4771cf4ed3ec86 data/amethystwings/advancements/recipes/misc/shaped_amethyst.heavy.json
 e95b211b885d807630cb3e200b88d9478a8047d3 data/amethystwings/advancements/recipes/misc/shaped_amethyst.json
 903e705b69bb17445b1944e1ab79141271452943 data/amethystwings/advancements/recipes/misc/shaped_amethyst.sturdy.json
+3a73d8bccf8d026b769c29fb8951ffa1d3ee2b6c data/amethystwings/advancements/recipes/misc/totemic_amethyst.json
+0a1be7b1e4da9bcd1474f224eaab9c3b481bdb81 data/amethystwings/advancements/recipes/misc/totemic_amethyst.merciful.json
+fdb7d62f26ae501b02f24cf011fd35a31a519664 data/amethystwings/advancements/recipes/misc/totemic_amethyst.nourishing.json
+13da3e84e84c1739da97a820ea5d9c3836448b9c data/amethystwings/advancements/recipes/misc/totemic_amethyst.vengeful.json
 c42951a31ce1d8a835f48fefe1d4852c740f76ef data/amethystwings/advancements/recipes/misc/treated_amethyst.json
 645fe9d8841984d693fd8e22e2b390414e828c5f data/amethystwings/advancements/recipes/misc/wings_controller.json
 137297491274cc94c96fb7bb2fe1f7d2217d74b1 data/amethystwings/recipes/auric_amethyst.barrier.json
@@ -41,5 +45,9 @@ f75149fd2ccf3ea2b8ce49ffce0aa40a8d38755b data/amethystwings/recipes/resonant_ame
 553ec7c1a357a5f08e09650c81edc5759eec81f6 data/amethystwings/recipes/shaped_amethyst.heavy.json
 823e1e90b6acceb58650153b3ce18197dabe9444 data/amethystwings/recipes/shaped_amethyst.json
 bb99f2b3d897097cba61f03a5589d5b38c0308b9 data/amethystwings/recipes/shaped_amethyst.sturdy.json
+d590e893c6bc3d3bfb667aee6e7a6beac4e0db33 data/amethystwings/recipes/totemic_amethyst.json
+6bc8ce33130820e0837e0ad979ac73f4c23cf323 data/amethystwings/recipes/totemic_amethyst.merciful.json
+049ce1befa071597f378f02211ef86061a997844 data/amethystwings/recipes/totemic_amethyst.nourishing.json
+ad173ee12ee6c70af0f8379783860c5366b2bcb8 data/amethystwings/recipes/totemic_amethyst.vengeful.json
 4e777c6bd2aabd764831de657005c70823b2ed20 data/amethystwings/recipes/treated_amethyst.json
 7e48c316e05fd6bca734e0e56e41f2e67ee39b7d data/amethystwings/recipes/wings_controller.json
