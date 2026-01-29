@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "amethystwings:auric_crystal"
+      "item": "amethystwings:auric_amethyst"
     },
     {
       "item": "minecraft:golden_apple"

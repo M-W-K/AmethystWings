@@ -24,6 +24,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+import java.util.List;
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(AmethystWingsMod.MODID)
 public class AmethystWingsMod {
@@ -55,8 +57,8 @@ public class AmethystWingsMod {
     }
 
     public void onModelRegistration(ModelEvent.RegisterAdditional event) {
-        ResourceLocation loc = DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> WingsItemStackRenderer::getWingsInventoryModel);
-        if (loc != null) event.register(loc);
+        List<ResourceLocation> locs = DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> WingsItemStackRenderer::getWingsInventoryModels);
+        if (locs != null) locs.forEach(event::register);
         event.register(AmethystWingsModelProvider.RESONANT);
         event.register(AmethystWingsModelProvider.HARDENED);
         event.register(AmethystWingsModelProvider.ENERGETIC);

@@ -1,8 +1,8 @@
-// 1.20.1	2026-01-28T09:52:22.607039	Tags for minecraft:item mod id amethystwings
+// 1.20.1	2026-01-28T10:13:33.548335	Tags for minecraft:item mod id amethystwings
 7595a13586aa5be58b861b20fb2d56558912c05f data/amethystwings/tags/items/auric_crystal.json
 a1039ec8cf44427bb672de3f0abf901d5c305c6c data/amethystwings/tags/items/crystal.json
 ec84fa3f3264dd6c3043a52bee130aa5036584b3 data/amethystwings/tags/items/energetic_crystal.json
 3ad4843fce9c2da71843ace89b7287ad86d30913 data/amethystwings/tags/items/hardened_crystal.json
 b0e268fe2542abbd163fc7aec9d5d3f036863305 data/amethystwings/tags/items/resonant_crystal.json
 4161dbbff20f5b5837a127c2061dca9fda8c1f15 data/amethystwings/tags/items/shaped_crystal.json
-80bae4ecf60f8375a443e27d52986a414497eb7a data/amethystwings/tags/items/totemic_crystal.json
+d6a4b71f6c7cd15c2960a5c16e977f61d4897ba0 data/amethystwings/tags/items/totemic_crystal.json

@@ -4,6 +4,7 @@
   "screen.amethystwings.item":"Amethyst Wings Controller",
 
   "item.amethystwings.wings_controller":"Amethyst Wings Controller",
+  "item.amethystwings.primitive_wings_controller":"Primitive Amethyst Wings Controller",
   "item.amethystwings.wings_controller.tooltip":"Right click to open crystal container",
   "item.amethystwings.wings_controller.tooltip2":"Attribute bonuses suffer diminishing returns",
   "item.amethystwings.treated_amethyst":"Treated Amethyst Shard",

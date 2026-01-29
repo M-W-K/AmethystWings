@@ -1,6 +1,5 @@
 package com.m_w_k.amethystwings.datagen;
 
-import com.m_w_k.amethystwings.AmethystWingsTags;
 import com.m_w_k.amethystwings.registry.AmethystWingsItemsRegistry;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.PackOutput;
@@ -20,8 +19,18 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> writer) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, AmethystWingsItemsRegistry.WINGS.get())
                 .pattern("ini").pattern("ttt").pattern("iei")
-                .define('i', Items.IRON_INGOT).define('n', Items.NETHER_STAR)
+                .define('i', Items.IRON_INGOT).
+                define('n', Items.NETHER_STAR)
                 .define('e', Items.ELYTRA)
+                .define('t', AmethystWingsItemsRegistry.TREATED_AMETHYST.get())
+                .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(Items.AMETHYST_SHARD))
+                .save(writer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, AmethystWingsItemsRegistry.PRIMITIVE_WINGS.get())
+                .pattern("ini").pattern("ttt").pattern("wew")
+                .define('i', Items.IRON_INGOT)
+                .define('w', Tags.Items.LEATHER)
+                .define('n', Items.EMERALD)
+                .define('e', Items.PHANTOM_MEMBRANE)
                 .define('t', AmethystWingsItemsRegistry.TREATED_AMETHYST.get())
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(Items.AMETHYST_SHARD))
                 .save(writer);
@@ -45,17 +54,17 @@ public class AmethystWingsRecipeProvider extends RecipeProvider {
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.STURDY_RESONANT_AMETHYST.get())
-                .requires(AmethystWingsTags.RESONANT_CRYSTAL).requires(Tags.Items.INGOTS_COPPER)
+                .requires(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()).requires(Tags.Items.INGOTS_COPPER)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.SPATIAL_RESONANT_AMETHYST.get())
-                .requires(AmethystWingsTags.RESONANT_CRYSTAL).requires(Items.ENDER_EYE)
+                .requires(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()).requires(Items.ENDER_EYE)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()))
                 .save(writer);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AmethystWingsItemsRegistry.LUCKY_RESONANT_AMETHYST.get())
-                .requires(AmethystWingsTags.RESONANT_CRYSTAL).requires(Items.RABBIT_FOOT)
+                .requires(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()).requires(Items.RABBIT_FOOT)
                 .unlockedBy("criteria", InventoryChangeTrigger.TriggerInstance.hasItems(AmethystWingsItemsRegistry.RESONANT_AMETHYST.get()))
                 .save(writer);
     }

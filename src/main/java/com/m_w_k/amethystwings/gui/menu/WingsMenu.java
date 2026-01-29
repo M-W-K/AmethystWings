@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 public class WingsMenu extends AbstractContainerMenu {
     private final Container container;
@@ -18,17 +19,17 @@ public class WingsMenu extends AbstractContainerMenu {
 
     private final Player player;
 
-    public WingsMenu(int p_39230_, Inventory p_39231_, Container p_39232_, int lockedslot) {
+    public WingsMenu(int p_39230_, Inventory p_39231_, WingsContainer wings, int lockedslot) {
         super(AmethystWingsGUIRegistry.WINGS_MENU.get(), p_39230_);
-        this.container = p_39232_;
+        this.container = wings;
         this.player = p_39231_.player;
-        p_39232_.startOpen(p_39231_.player);
-        int i = 36;
+        wings.startOpen(p_39231_.player);
+        int i = (wings.getRowCount() - 4) * 18;
         this.lockedslot = lockedslot;
 
-        for(int j = 0; j < 6; ++j) {
+        for(int j = 0; j < wings.getRowCount(); ++j) {
             for(int k = 0; k < 9; ++k) {
-                this.addSlot(new CrystalSlot(p_39232_, k + j * 9, 8 + k * 18, 18 + j * 18));
+                this.addSlot(new CrystalSlot(wings, k + j * 9, 8 + k * 18, 18 + j * 18));
             }
         }
 
@@ -68,11 +69,11 @@ public class WingsMenu extends AbstractContainerMenu {
         if (slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            if (p_39254_ < 54) {
-                if (!this.moveItemStackTo(itemstack1, 54, this.slots.size(), true)) {
+            if (p_39254_ < container.getContainerSize()) {
+                if (!this.moveItemStackTo(itemstack1, container.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 0, 54, false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 0, container.getContainerSize(), false)) {
                 return ItemStack.EMPTY;
             }
 
@@ -106,6 +107,10 @@ public class WingsMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(@NotNull Player p_38874_) {
         return this.container.stillValid(p_38874_);
+    }
+
+    public @Range(from = 1, to = 6) int getRowCount() {
+        return ((WingsContainer) container).getRowCount();
     }
 
     protected static class CrystalSlot extends Slot {

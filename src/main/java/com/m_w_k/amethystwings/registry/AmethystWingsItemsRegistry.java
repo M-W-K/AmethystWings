@@ -24,8 +24,8 @@ import static com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider.*;
 public class AmethystWingsItemsRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
-    public static final RegistryObject<Item> WINGS = ITEMS.register("wings_controller", () -> new WingsItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.UNCOMMON)));
-    // add primitive wings with only 18 slots, does not need elytra or nether star to craft
+    public static final RegistryObject<Item> WINGS = ITEMS.register("wings_controller", () -> new WingsItem(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.UNCOMMON), 6));
+    public static final RegistryObject<Item> PRIMITIVE_WINGS = ITEMS.register("primitive_wings_controller", () -> new WingsItem(new Item.Properties().stacksTo(1).fireResistant(), 2));
 
     public static final RegistryObject<Item> TREATED_AMETHYST = ITEMS.register("treated_amethyst", () -> new Item(new Item.Properties()));
 

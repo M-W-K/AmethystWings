@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "e": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "n": {
+      "item": "minecraft:emerald"
+    },
+    "t": {
+      "item": "amethystwings:treated_amethyst"
+    },
+    "w": {
+      "tag": "forge:leather"
+    }
+  },
+  "pattern": [
+    "ini",
+    "ttt",
+    "wew"
+  ],
+  "result": {
+    "item": "amethystwings:primitive_wings_controller"
+  },
+  "show_notification": true
+}

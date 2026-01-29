@@ -2,6 +2,7 @@ package com.m_w_k.amethystwings.inventory;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.gui.menu.WingsMenu;
+import com.m_w_k.amethystwings.item.WingsItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 public class WingsContainer implements MenuProvider, Nameable, Container {
 
@@ -50,7 +52,11 @@ public class WingsContainer implements MenuProvider, Nameable, Container {
 
     @Override
     public int getContainerSize() {
-        return 54;
+        return getRowCount() * 9;
+    }
+
+    public @Range(from = 1, to = 6) int getRowCount() {
+        return ((WingsItem) selfStack.getItem()).getRowCount();
     }
 
     @Override

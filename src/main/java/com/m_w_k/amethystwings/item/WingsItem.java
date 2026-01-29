@@ -30,14 +30,18 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullLazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class WingsItem extends Item implements Equipable {
-    public WingsItem(Properties itemProperties) {
+    protected final @Range(from = 1, to = 6) int rowCount;
+
+    public WingsItem(Properties itemProperties, @Range(from = 1, to = 6) int rowCount) {
         super(itemProperties);
         DispenserBlock.registerBehavior(this, ArmorItem.DISPENSE_ITEM_BEHAVIOR);
+        this.rowCount = rowCount;
     }
 
     @Override
@@ -164,5 +168,9 @@ public class WingsItem extends Item implements Equipable {
                 return renderer.get();
             }
         });
+    }
+
+    public @Range(from = 1, to = 6) int getRowCount() {
+        return rowCount;
     }
 }

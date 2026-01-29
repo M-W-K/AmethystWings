@@ -1,5 +1,8 @@
 {
   "values": [
-    "amethystwings:totemic_amethyst"
+    "amethystwings:totemic_amethyst",
+    "amethystwings:totemic_amethyst.vengeful",
+    "amethystwings:totemic_amethyst.merciful",
+    "amethystwings:totemic_amethyst.nourishing"
   ]
 }

@@ -16,10 +16,12 @@ import org.jetbrains.annotations.NotNull;
 @OnlyIn(Dist.CLIENT)
 public class WingsScreen extends AbstractContainerScreen<WingsMenu> implements MenuAccess<WingsMenu> {
     private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png");
+    private final int containerRows;
 
-    public WingsScreen(WingsMenu p_97741_, Inventory p_97742_, Component p_97743_) {
-        super(p_97741_, p_97742_, p_97743_);
-        this.imageHeight = 114 + 6 * 18;
+    public WingsScreen(WingsMenu menu, Inventory p_97742_, Component p_97743_) {
+        super(menu, p_97742_, p_97743_);
+        this.containerRows = menu.getRowCount();
+        this.imageHeight = 114 + this.containerRows * 18;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -40,7 +42,7 @@ public class WingsScreen extends AbstractContainerScreen<WingsMenu> implements M
     protected void renderBg(GuiGraphics graphics, float p_97788_, int p_97789_, int p_97790_) {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        graphics.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, 6 * 18 + 17);
-        graphics.blit(CONTAINER_BACKGROUND, i, j + 6 * 18 + 17, 0, 126, this.imageWidth, 96);
+        graphics.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17);
+        graphics.blit(CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96);
     }
 }

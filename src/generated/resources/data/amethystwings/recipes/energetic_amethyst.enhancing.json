@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "amethystwings:energetic_crystal"
+      "item": "amethystwings:energetic_amethyst"
     },
     {
       "item": "minecraft:sugar"

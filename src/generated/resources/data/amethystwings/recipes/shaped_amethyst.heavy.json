@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "amethystwings:shaped_crystal"
+      "item": "amethystwings:shaped_amethyst"
     },
     {
       "tag": "forge:stone"

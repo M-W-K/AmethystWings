@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "amethystwings:hardened_crystal"
+      "item": "amethystwings:hardened_amethyst"
     },
     {
       "tag": "forge:ingots/copper"

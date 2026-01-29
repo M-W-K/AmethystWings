@@ -5,6 +5,7 @@ import com.m_w_k.amethystwings.api.util.WingsRenderHelper;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.client.model.WingsModel;
 import com.m_w_k.amethystwings.item.WingsItem;
+import com.m_w_k.amethystwings.registry.AmethystWingsItemsRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,7 @@ import org.joml.Quaterniond;
 import org.joml.Quaternionf;
 
 import java.util.Iterator;
+import java.util.List;
 
 import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 
@@ -36,7 +38,9 @@ import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final WingsModel WINGS_MODEL = new WingsModel(WingsModel.createLayer().bakeRoot());
     public static final ModelResourceLocation WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "wings_controller_inventory", "inventory");
+    public static final ModelResourceLocation PRIMITIVE_WINGS_INVENTORY_MODEL = new ModelResourceLocation(MODID, "primitive_wings_controller_inventory", "inventory");
     public static final ResourceLocation WINGS_TEXTURE = new ResourceLocation(MODID, "textures/block/wings_controller.png");
+    public static final ResourceLocation PRIMITIVE_WINGS_TEXTURE = new ResourceLocation(MODID, "textures/block/primitive_wings_controller.png");
 
     private final static PoseStack ELYTRA_HELPER = new PoseStack();
     private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
@@ -54,11 +58,13 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
             poseStack.popPose(); // remove the -0.5, -0.5, -0.5 shift
             poseStack.pushPose();
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(WINGS_INVENTORY_MODEL);
+            ResourceLocation modelLoc = stack.getItem() == AmethystWingsItemsRegistry.WINGS.get() ? WINGS_INVENTORY_MODEL : PRIMITIVE_WINGS_INVENTORY_MODEL;
+            BakedModel model = renderer.getItemModelShaper().getModelManager().getModel(modelLoc);
             renderer.render(stack, context, false, poseStack, buffer, combinedLightIn, combinedOverlayIn, model);
         } else {
             boolean mirrored = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
-            WINGS_MODEL.render(poseStack, buffer.getBuffer(RenderType.entitySolid(WINGS_TEXTURE)), combinedLightIn, combinedOverlayIn, mirrored);
+            ResourceLocation tex = stack.getItem() == AmethystWingsItemsRegistry.WINGS.get() ? WINGS_TEXTURE : PRIMITIVE_WINGS_TEXTURE;
+            WINGS_MODEL.render(poseStack, buffer.getBuffer(RenderType.entitySolid(tex)), combinedLightIn, combinedOverlayIn, mirrored);
             if (context.firstPerson() && stack.getItem() instanceof WingsItem item) {
                 crystalFirstPersonRender(item.getCapability(stack), poseStack, buffer, combinedLightIn, combinedOverlayIn, context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND);
             }
@@ -190,7 +196,7 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
         ELYTRA_HELPER.popPose();
     }
 
-    public static ResourceLocation getWingsInventoryModel() {
-        return WINGS_INVENTORY_MODEL;
+    public static List<ResourceLocation> getWingsInventoryModels() {
+        return List.of(WINGS_INVENTORY_MODEL, PRIMITIVE_WINGS_INVENTORY_MODEL);
     }
 }
