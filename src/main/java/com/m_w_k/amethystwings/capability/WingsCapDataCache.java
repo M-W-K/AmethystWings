@@ -47,6 +47,9 @@ public final class WingsCapDataCache {
     }
 
     public static WingsCapClientData rebind(@NotNull DataKey oldKey, @NotNull DataKey newKey) {
+        if (FMLEnvironment.dist.isDedicatedServer()) {
+            return FALLBACK; // the server does not track client data, do not handle rebindings.
+        }
         WingsCapClientData data = CACHE.get(newKey);
         if (data != null) {
             CACHE.remove(oldKey);

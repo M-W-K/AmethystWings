@@ -19,6 +19,7 @@ public enum TotemBehavior {
             for (Entity entity : entitySaved.level().getEntities(entitySaved, AABB.ofSize(entitySaved.position(), size, size, size))) {
                 if (entity instanceof LivingEntity living && entity.distanceToSqr(entitySaved) < size * size) {
                     living.knockback(1.0, entitySaved.getX() - entity.getX(), entitySaved.getZ() - entity.getZ());
+                    living.hurtMarked = true;
                     strengtheningEffect(living, MobEffects.MOVEMENT_SLOWDOWN, 1200);
                     strengtheningEffect(living, MobEffects.WEAKNESS, 2400);
                 }
