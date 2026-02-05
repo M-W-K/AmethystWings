@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.m_w_k.amethystwings.api.TotemBehavior;
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
-import com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -12,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -53,12 +51,6 @@ public abstract class LivingEntityMixin extends Entity {
             return cap.canElytra() && cap.elytraFlightTick(thiss, this.fallFlyTicks);
         }
         return false;
-    }
-
-    @ModifyReturnValue(method = "createLivingAttributes", at = @At("RETURN"))
-    private static AttributeSupplier.Builder attachWarding(AttributeSupplier.Builder builder) {
-        return builder.add(AmethystWingsAttributeRegistry.WARDING.get())
-                .add(AmethystWingsAttributeRegistry.BARRIER.get());
     }
 
     @ModifyReturnValue(method = "checkTotemDeathProtection", at = @At("RETURN"))

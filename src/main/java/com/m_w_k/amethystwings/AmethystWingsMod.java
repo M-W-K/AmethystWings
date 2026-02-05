@@ -12,19 +12,26 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.List;
+
+import static com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry.BARRIER;
+import static com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry.WARDING;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(AmethystWingsMod.MODID)
@@ -40,6 +47,7 @@ public class AmethystWingsMod {
         AmethystWingsRegistry.init(modEventBus);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::onModelRegistration);
+        modEventBus.addListener(this::attachAttributes);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(Keybindings::registerBindings));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AmethystWingsConfig.SPEC);
@@ -65,5 +73,16 @@ public class AmethystWingsMod {
         event.register(AmethystWingsModelProvider.SHAPED);
         event.register(AmethystWingsModelProvider.AURIC);
         event.register(AmethystWingsModelProvider.TOTEMIC);
+    }
+
+    public void attachAttributes(@NotNull EntityAttributeModificationEvent event) {
+        for (EntityType<? extends LivingEntity> t : event.getTypes()) {
+            if (!event.has(t, WARDING.get())) {
+                event.add(t, WARDING.get());
+            }
+            if (!event.has(t, BARRIER.get())) {
+                event.add(t, BARRIER.get());
+            }
+        }
     }
 }

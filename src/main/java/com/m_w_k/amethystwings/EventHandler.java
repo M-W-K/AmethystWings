@@ -2,7 +2,6 @@ package com.m_w_k.amethystwings;
 
 import com.m_w_k.amethystwings.capability.WingsCapability;
 import com.m_w_k.amethystwings.item.WingsItem;
-import com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -23,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry.BARRIER;
+import static com.m_w_k.amethystwings.registry.AmethystWingsAttributeRegistry.WARDING;
 
 @Mod.EventBusSubscriber(modid = AmethystWingsMod.MODID)
 public final class EventHandler {
@@ -106,14 +108,18 @@ public final class EventHandler {
         // apply warding
         // block things that armor can block, and magic-type damage that witches can resist.
         if (!event.getSource().is(DamageTypeTags.BYPASSES_ARMOR) || event.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO)) {
-            double reduction = receiver.getAttributeValue(AmethystWingsAttributeRegistry.WARDING.get());
-            amount = Math.max(amount - reduction, 1);
+            if (receiver.getAttributes().hasAttribute(WARDING.get())) {
+                double reduction = receiver.getAttributeValue(WARDING.get());
+                amount = Math.max(amount - reduction, 1);
+            }
         }
         // apply barrier
         // blocks everything that doesn't bypass invulnerability
         if (!event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            double barrier = receiver.getAttributeValue(AmethystWingsAttributeRegistry.BARRIER.get());
-            amount = Math.pow(amount, 1 - barrier);
+            if (receiver.getAttributes().hasAttribute(BARRIER.get())) {
+                double barrier = receiver.getAttributeValue(BARRIER.get());
+                amount = Math.pow(amount, 1 - barrier);
+            }
         }
         event.setAmount((float) amount);
     }
