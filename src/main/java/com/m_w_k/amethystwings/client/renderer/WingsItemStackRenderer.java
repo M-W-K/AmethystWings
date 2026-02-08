@@ -31,6 +31,7 @@ import org.joml.Quaternionf;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static com.m_w_k.amethystwings.AmethystWingsMod.MODID;
 
@@ -43,8 +44,8 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     public static final ResourceLocation PRIMITIVE_WINGS_TEXTURE = new ResourceLocation(MODID, "textures/block/primitive_wings_controller.png");
 
     private final static PoseStack ELYTRA_HELPER = new PoseStack();
-    private final static ModelPart RIGHT_FAKE_WING = new ModelPart(null, null);
-    private final static ModelPart LEFT_FAKE_WING = new ModelPart(null, null);
+    private final static ModelPart RIGHT_FAKE_WING = new ModelPart(List.of(), Map.of());
+    private final static ModelPart LEFT_FAKE_WING = new ModelPart(List.of(), Map.of());
 
     private final static Quaternionf CORRECTION = new Quaternionf(0, 0, 1, 0);
 
