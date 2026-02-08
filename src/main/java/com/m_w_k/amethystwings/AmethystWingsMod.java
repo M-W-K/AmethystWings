@@ -6,6 +6,7 @@ import com.m_w_k.amethystwings.datagen.AmethystWingsBlockTagsProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsItemTagsProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsModelProvider;
 import com.m_w_k.amethystwings.datagen.AmethystWingsRecipeProvider;
+import com.m_w_k.amethystwings.integration.tconstruct.TConstructPlugin;
 import com.m_w_k.amethystwings.network.PacketHandler;
 import com.m_w_k.amethystwings.registry.AmethystWingsRegistry;
 import com.mojang.logging.LogUtils;
@@ -21,9 +22,11 @@ import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -45,12 +48,19 @@ public class AmethystWingsMod {
         PacketHandler.init();
 
         AmethystWingsRegistry.init(modEventBus);
+        modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::onModelRegistration);
         modEventBus.addListener(this::attachAttributes);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(Keybindings::registerBindings));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AmethystWingsConfig.SPEC);
+    }
+
+    public void commonSetup(FMLCommonSetupEvent event) {
+        if (ModList.get().isLoaded("tconstruct")){
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(TConstructPlugin::registerModifiers);
+        }
     }
 
     public void gatherData(GatherDataEvent event) {

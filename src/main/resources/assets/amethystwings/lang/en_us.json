@@ -56,5 +56,12 @@
   "attribute.name.amethystwings.barrier": "Barrier",
 
   "key.amethystwings.boost.description": "Trigger Crystal Boost",
-  "key.amethystwings.category": "Amethyst Wings"
+  "key.amethystwings.category": "Amethyst Wings",
+
+  "material.amethystwings.treated_amethyst": "Treated Amethyst",
+  "material.amethystwings.treated_amethyst.flavor": "Useless on its own, powerful in combination.",
+  "material.amethystwings.treated_amethyst.encyclopedia": "Increases the level of other material traits on the tool by 1 per level.",
+  "modifier.amethystwings.combining": "Combining",
+  "modifier.amethystwings.combining.flavor": "Supporting role",
+  "modifier.amethystwings.combining.description": "Enhances other material traits"
 }
