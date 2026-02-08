@@ -5,7 +5,6 @@
   ],
   "luminosity": 2,
   "generator": {
-    "ignoreMaterialStats": false,
     "supported_stats": [
       "tconstruct:head",
       "tconstruct:handle",
@@ -25,19 +24,23 @@
             "grey": 0
           },
           {
-            "color": "FF472776",
+            "color": "FF482675",
             "grey": 63
           },
           {
-            "color": "FF7b50b0",
+            "color": "FF5c3694",
             "grey": 102
           },
           {
-            "color": "FF996adf",
+            "color": "FF361469",
             "grey": 140
           },
           {
-            "color": "FF250f46",
+            "color": "FF996adf",
+            "grey": 178
+          },
+          {
+            "color": "FFc98def",
             "grey": 216
           },
           {
