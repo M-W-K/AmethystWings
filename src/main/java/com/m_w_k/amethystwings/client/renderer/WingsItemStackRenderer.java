@@ -73,9 +73,9 @@ public class WingsItemStackRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     private static void crystalFirstPersonRender(@NotNull WingsCapability cap, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn, boolean mirrored) {
-        if (!cap.isBlocking()) return;
         assert Minecraft.getInstance().player != null;
         cap.handleParticles(Minecraft.getInstance().player);
+        if (!cap.isBlocking()) return;
         poseStack.popPose();
         poseStack.pushPose();
         poseStack.translate(mirrored ? 0.6 : -0.52, 0.2, 0.55);
